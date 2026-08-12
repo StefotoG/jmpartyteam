@@ -47,6 +47,7 @@ async function uploadImage(publicPath) {
 }
 
 const slug = (current) => ({ _type: 'slug', current });
+const serviceRef = (key) => ({ _type: 'reference', _ref: `service-${key}` });
 
 const { settings, services, packages, addons, gallery, mixes, testimonials, faqs } =
   placeholderContent;
@@ -86,7 +87,7 @@ for (const item of gallery) {
     isPlaceholder: item.isPlaceholder,
     key: item.key,
     alt: item.alt,
-    serviceKey: item.serviceKey,
+    service: serviceRef(item.serviceKey),
     venue: item.venue,
     image: await uploadImage(item.image),
   });
@@ -97,10 +98,12 @@ for (const item of mixes) {
 }
 
 for (const item of testimonials) {
+  const { serviceKey, ...rest } = item;
   documents.push({
     _id: `testimonial-${item.key}`,
     _type: 'testimonial',
-    ...item,
+    ...rest,
+    service: serviceRef(serviceKey),
   });
 }
 

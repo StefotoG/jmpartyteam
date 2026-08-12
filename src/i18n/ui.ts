@@ -7,7 +7,6 @@ const bg = {
   'nav.gallery': 'Галерия',
   'nav.music': 'Музика',
   'nav.pricing': 'Цени',
-  'nav.availability': 'Свободни дати',
   'nav.about': 'За нас',
   'nav.testimonials': 'Отзиви',
   'nav.faq': 'Въпроси',
@@ -18,7 +17,6 @@ const bg = {
   'nav.skipToContent': 'Към основното съдържание',
 
   'cta.book': 'Запитване за дата',
-  'cta.checkDate': 'Провери свободна дата',
   'cta.call': 'Обади се',
   'cta.viber': 'Viber',
   'cta.whatsapp': 'WhatsApp',
@@ -33,16 +31,6 @@ const bg = {
   'pricing.onRequest': 'По запитване',
   'pricing.note':
     'Цените са ориентировъчни и зависят от датата, локацията и продължителността.',
-
-  'availability.title': 'Свободни дати',
-  'availability.free': 'Свободно',
-  'availability.busy': 'Заето',
-  'availability.past': 'Отминала дата',
-  'availability.disclaimer':
-    'Календарът е ориентировъчен. Моля, потвърдете датата със запитване.',
-  'availability.unavailable':
-    'Календарът временно не е достъпен. Свържете се с нас и ще проверим датата веднага.',
-  'availability.loading': 'Зареждане на календара…',
 
   'form.title': 'Запитване',
   'form.name': 'Име',
@@ -61,7 +49,6 @@ const bg = {
   'form.error': 'Нещо се обърка. Опитайте отново или ни се обадете.',
   'form.required': 'Задължително поле',
   'form.optional': 'по избор',
-  'form.dateTaken': 'Тази дата изглежда заета — пишете ни за алтернативи.',
 
   'footer.rights': 'Всички права запазени.',
   'footer.privacy': 'Политика за поверителност',
@@ -82,7 +69,6 @@ const en: Record<UIKey, string> = {
   'nav.gallery': 'Gallery',
   'nav.music': 'Music',
   'nav.pricing': 'Pricing',
-  'nav.availability': 'Availability',
   'nav.about': 'About',
   'nav.testimonials': 'Reviews',
   'nav.faq': 'FAQ',
@@ -93,7 +79,6 @@ const en: Record<UIKey, string> = {
   'nav.skipToContent': 'Skip to main content',
 
   'cta.book': 'Check your date',
-  'cta.checkDate': 'Check availability',
   'cta.call': 'Call us',
   'cta.viber': 'Viber',
   'cta.whatsapp': 'WhatsApp',
@@ -108,16 +93,6 @@ const en: Record<UIKey, string> = {
   'pricing.onRequest': 'On request',
   'pricing.note':
     'Prices are indicative and depend on the date, location and duration.',
-
-  'availability.title': 'Availability',
-  'availability.free': 'Available',
-  'availability.busy': 'Booked',
-  'availability.past': 'Past date',
-  'availability.disclaimer':
-    'This calendar is indicative. Please confirm your date with an enquiry.',
-  'availability.unavailable':
-    'The calendar is temporarily unavailable. Get in touch and we will check your date right away.',
-  'availability.loading': 'Loading calendar…',
 
   'form.title': 'Enquiry',
   'form.name': 'Name',
@@ -136,7 +111,6 @@ const en: Record<UIKey, string> = {
   'form.error': 'Something went wrong. Please try again or call us.',
   'form.required': 'Required field',
   'form.optional': 'optional',
-  'form.dateTaken': 'That date looks booked — message us about alternatives.',
 
   'footer.rights': 'All rights reserved.',
   'footer.privacy': 'Privacy policy',

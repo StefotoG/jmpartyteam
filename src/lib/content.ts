@@ -22,7 +22,8 @@ const SITE_CONTENT_QUERY = /* groq */ `{
     isPlaceholder, key, name, priceEur, isFrom
   },
   "gallery": *[_type == "galleryItem"] | order(_createdAt desc){
-    isPlaceholder, key, alt, serviceKey, venue,
+    isPlaceholder, key, alt, venue,
+    "serviceKey": service->key,
     "image": image.asset->url + "?w=900&h=900&fit=crop&auto=format",
     "width": 900,
     "height": 900
@@ -31,7 +32,8 @@ const SITE_CONTENT_QUERY = /* groq */ `{
     isPlaceholder, key, title, platform, embedUrl, durationMinutes, genres
   },
   "testimonials": *[_type == "testimonial"] | order(date desc){
-    isPlaceholder, key, author, serviceKey, date, quote, rating
+    isPlaceholder, key, author, date, quote, rating,
+    "serviceKey": service->key
   },
   "faqs": *[_type == "faq"] | order(_createdAt asc){
     isPlaceholder, key, question, answer

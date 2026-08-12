@@ -11,7 +11,6 @@ export const SEGMENTS = {
   gallery: { bg: 'galeriya', en: 'gallery' },
   music: { bg: 'muzika', en: 'music' },
   pricing: { bg: 'ceni', en: 'pricing' },
-  availability: { bg: 'nalichnost', en: 'availability' },
   about: { bg: 'za-nas', en: 'about' },
   testimonials: { bg: 'otzivi', en: 'testimonials' },
   faq: { bg: 'faq', en: 'faq' },

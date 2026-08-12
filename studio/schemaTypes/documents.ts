@@ -221,16 +221,16 @@ export const galleryItem = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'serviceKey',
+      name: 'service',
       title: 'Вид събитие',
-      type: 'string',
-      description: 'Ключът на услугата, например weddings.',
+      type: 'reference',
+      to: [{ type: 'service' }],
       validation: (rule) => rule.required(),
     }),
     defineField({ name: 'venue', title: 'Локация', type: 'string' }),
   ],
   preview: {
-    select: { title: 'alt.bg', media: 'image', subtitle: 'serviceKey' },
+    select: { title: 'alt.bg', media: 'image', subtitle: 'service.title.bg' },
   },
 });
 
@@ -302,9 +302,10 @@ export const testimonial = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'serviceKey',
+      name: 'service',
       title: 'Вид събитие',
-      type: 'string',
+      type: 'reference',
+      to: [{ type: 'service' }],
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -322,7 +323,7 @@ export const testimonial = defineType({
       validation: (rule) => rule.required().min(1).max(5).integer(),
     }),
   ],
-  preview: { select: { title: 'author', subtitle: 'serviceKey' } },
+  preview: { select: { title: 'author', subtitle: 'service.title.bg' } },
 });
 
 export const faq = defineType({

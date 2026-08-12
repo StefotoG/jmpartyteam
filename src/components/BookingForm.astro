@@ -87,9 +87,6 @@ const labelClass = 'mb-1.5 block text-sm font-semibold';
         min={today}
         class={fieldClass}
       />
-      <p id="date-warning" hidden class="mt-2 text-sm text-accent">
-        {t('form.dateTaken')}
-      </p>
     </div>
 
     <div>
@@ -174,24 +171,6 @@ const labelClass = 'mb-1.5 block text-sm font-semibold';
     'booking-submit'
   ) as HTMLButtonElement | null;
   const feedback = document.getElementById('booking-feedback');
-  const dateInput = document.getElementById(
-    'eventDate'
-  ) as HTMLInputElement | null;
-  const dateWarning = document.getElementById('date-warning');
-
-  // Advisory only — the enquiry can still be sent for a date that looks taken.
-  if (dateInput && dateWarning) {
-    fetch('/api/availability')
-      .then((response) => (response.ok ? response.json() : null))
-      .then((data) => {
-        if (!data || data.error) return;
-        const busy = new Set<string>(data.busyDates ?? []);
-        dateInput.addEventListener('change', () => {
-          dateWarning.hidden = !busy.has(dateInput.value);
-        });
-      })
-      .catch(() => {});
-  }
 
   if (form && submitButton && feedback) {
     const labels = submitButton.dataset;
