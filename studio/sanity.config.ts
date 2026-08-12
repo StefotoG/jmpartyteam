@@ -1,7 +1,9 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
+import { internationalizedArray } from 'sanity-plugin-internationalized-array';
 import { schemaTypes } from './schemaTypes';
+import { LANGUAGES } from './schemaTypes/localeTypes';
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID!;
 const dataset = process.env.SANITY_STUDIO_DATASET ?? 'production';
@@ -36,6 +38,11 @@ export default defineConfig({
           ]),
     }),
     visionTool(),
+    internationalizedArray({
+      languages: LANGUAGES,
+      defaultLanguages: ['bg'],
+      fieldTypes: ['string', 'text', 'slug', 'stringList', 'textList'],
+    }),
   ],
   schema: {
     types: schemaTypes,

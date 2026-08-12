@@ -1,9 +1,11 @@
 /**
  * Seeds a Sanity dataset from src/content/placeholder.ts so the DJs open a Studio that
- * already has the right shape, rather than a blank one. Idempotent: document IDs are
- * derived from content keys, so re-running updates instead of duplicating.
+ * already has the right shape, rather than a blank one.
  *
- * Requires a write token (Sanity project -> API -> Tokens -> Editor):
+ * Re-runnable: it first deletes documents flagged isPlaceholder, then recreates them.
+ * Real content is never touched, because real content has that flag turned off.
+ *
+ * Requires a write token (Sanity -> API -> Tokens -> Editor):
  *   SANITY_PROJECT_ID=... SANITY_WRITE_TOKEN=... node scripts/seed-sanity.mjs
  */
 import { createClient } from '@sanity/client';
@@ -30,6 +32,21 @@ const client = createClient({
   useCdn: false,
 });
 
+/** sanity-plugin-internationalized-array stores values as [{_key, _type, value}]. */
+const intl = (type, localized) =>
+  ['bg', 'en'].map((lang) => ({
+    _key: lang,
+    _type: `internationalizedArray${type}Value`,
+    value: localized[lang],
+  }));
+
+const intlSlug = (localized) =>
+  ['bg', 'en'].map((lang) => ({
+    _key: lang,
+    _type: 'internationalizedArraySlugValue',
+    value: { _type: 'slug', current: localized[lang] },
+  }));
+
 const assetCache = new Map();
 
 async function uploadImage(publicPath) {
@@ -46,79 +63,148 @@ async function uploadImage(publicPath) {
   return ref;
 }
 
-const slug = (current) => ({ _type: 'slug', current });
-const serviceRef = (key) => ({ _type: 'reference', _ref: `service-${key}` });
+// Referencing documents must go before the documents they point at.
+const DELETE_ORDER = [
+  'galleryItem',
+  'testimonial',
+  'mix',
+  'faq',
+  'pricePackage',
+  'addon',
+  'service',
+];
+
+for (const type of DELETE_ORDER) {
+  await client.delete({ query: `*[_type == $type && isPlaceholder == true]`, params: { type } });
+}
+console.log('Cleared previously seeded placeholder documents.');
 
 const { settings, services, packages, addons, gallery, mixes, testimonials, faqs } =
   placeholderContent;
 
-const documents = [];
+await client.createOrReplace({
+  _id: 'siteSettings',
+  _type: 'siteSettings',
+  isPlaceholder: true,
+  brandName: settings.brandName,
+  phonePrimary: settings.phonePrimary,
+  phoneSecondary: settings.phoneSecondary,
+  viber: settings.viber,
+  whatsapp: settings.whatsapp,
+  email: settings.email,
+  instagram: settings.instagram,
+  facebook: settings.facebook,
+  tiktok: settings.tiktok,
+  foundingYear: settings.foundingYear,
+  eventsCompleted: settings.eventsCompleted,
+  cities: intl('StringList', settings.cities),
+  addressLocality: intl('String', settings.addressLocality),
+});
 
-documents.push({ _id: 'siteSettings', _type: 'siteSettings', ...settings });
+// Sanity assigns the IDs; references use the IDs it returns.
+const serviceIdByKey = new Map();
 
-for (const service of services) {
-  documents.push({
-    _id: `service-${service.key}`,
+for (const item of services) {
+  const created = await client.create({
     _type: 'service',
-    isPlaceholder: service.isPlaceholder,
-    key: service.key,
-    order: service.order,
-    title: service.title,
-    summary: service.summary,
-    body: service.body,
-    inclusions: service.inclusions,
-    slug: { bg: slug(service.slug.bg), en: slug(service.slug.en) },
-    image: await uploadImage(service.image),
+    isPlaceholder: true,
+    key: item.key,
+    order: item.order,
+    slug: intlSlug(item.slug),
+    title: intl('String', item.title),
+    summary: intl('Text', item.summary),
+    body: intl('TextList', item.body),
+    inclusions: intl('StringList', item.inclusions),
+    image: await uploadImage(item.image),
+  });
+  serviceIdByKey.set(item.key, created._id);
+}
+
+const serviceRef = (key) => ({
+  _type: 'reference',
+  _ref: serviceIdByKey.get(key),
+});
+
+for (const item of packages) {
+  await client.create({
+    _type: 'pricePackage',
+    isPlaceholder: true,
+    key: item.key,
+    priceEur: item.priceEur,
+    isFrom: item.isFrom,
+    highlighted: item.highlighted,
+    name: intl('String', item.name),
+    features: intl('StringList', item.features),
   });
 }
 
-for (const item of packages) {
-  documents.push({ _id: `package-${item.key}`, _type: 'pricePackage', ...item });
-}
-
 for (const item of addons) {
-  documents.push({ _id: `addon-${item.key}`, _type: 'addon', ...item });
+  await client.create({
+    _type: 'addon',
+    isPlaceholder: true,
+    key: item.key,
+    priceEur: item.priceEur,
+    isFrom: item.isFrom,
+    name: intl('String', item.name),
+  });
 }
 
 for (const item of gallery) {
-  documents.push({
-    _id: `gallery-${item.key}`,
+  await client.create({
     _type: 'galleryItem',
-    isPlaceholder: item.isPlaceholder,
-    key: item.key,
-    alt: item.alt,
-    service: serviceRef(item.serviceKey),
+    isPlaceholder: true,
     venue: item.venue,
+    alt: intl('String', item.alt),
+    service: serviceRef(item.serviceKey),
     image: await uploadImage(item.image),
   });
 }
 
 for (const item of mixes) {
-  documents.push({ _id: `mix-${item.key}`, _type: 'mix', ...item });
-}
-
-for (const item of testimonials) {
-  const { serviceKey, ...rest } = item;
-  documents.push({
-    _id: `testimonial-${item.key}`,
-    _type: 'testimonial',
-    ...rest,
-    service: serviceRef(serviceKey),
+  await client.create({
+    _type: 'mix',
+    isPlaceholder: true,
+    title: item.title,
+    platform: item.platform,
+    embedUrl: item.embedUrl || undefined,
+    durationMinutes: item.durationMinutes,
+    genres: intl('StringList', item.genres),
   });
 }
 
-for (const item of faqs) {
-  documents.push({ _id: `faq-${item.key}`, _type: 'faq', ...item });
+for (const item of testimonials) {
+  await client.create({
+    _type: 'testimonial',
+    isPlaceholder: true,
+    author: item.author,
+    date: item.date,
+    rating: item.rating,
+    service: serviceRef(item.serviceKey),
+    quote: intl('Text', item.quote),
+  });
 }
 
-const transaction = documents.reduce(
-  (tx, doc) => tx.createOrReplace(doc),
-  client.transaction()
-);
+for (const [index, item] of faqs.entries()) {
+  await client.create({
+    _type: 'faq',
+    isPlaceholder: true,
+    order: index + 1,
+    question: intl('String', item.question),
+    answer: intl('Text', item.answer),
+  });
+}
 
-await transaction.commit();
+const total =
+  1 +
+  services.length +
+  packages.length +
+  addons.length +
+  gallery.length +
+  mixes.length +
+  testimonials.length +
+  faqs.length;
 
 console.log(
-  `Seeded ${documents.length} documents and ${assetCache.size} images into ${projectId}/${dataset}.`
+  `Seeded ${total} documents and ${assetCache.size} images into ${projectId}/${dataset}.`
 );
 console.log('All documents are flagged isPlaceholder — replace before launch.');

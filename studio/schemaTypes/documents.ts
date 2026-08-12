@@ -39,12 +39,12 @@ export const siteSettings = defineType({
     defineField({
       name: 'cities',
       title: 'Градове, в които работим',
-      type: 'localeStringList',
+      type: 'internationalizedArrayStringList',
     }),
     defineField({
       name: 'addressLocality',
       title: 'Основен град',
-      type: 'localeString',
+      type: 'internationalizedArrayString',
     }),
     defineField({
       name: 'foundingYear',
@@ -75,7 +75,7 @@ export const service = defineType({
       title: 'Ключ',
       type: 'string',
       description:
-        'Технически идентификатор, използван за връзка със снимки и отзиви. Не го променяйте след публикуване.',
+        'Технически идентификатор на латиница, например catering. Не го променяйте след публикуване.',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -87,16 +87,29 @@ export const service = defineType({
     defineField({
       name: 'slug',
       title: 'URL адрес',
-      type: 'localeSlug',
-      validation: (rule) => rule.required(),
+      type: 'internationalizedArraySlug',
+      description:
+        'На латиница. Например svatbi за български и weddings за английски.',
     }),
-    defineField({ name: 'title', title: 'Заглавие', type: 'localeString' }),
-    defineField({ name: 'summary', title: 'Кратко описание', type: 'localeText' }),
-    defineField({ name: 'body', title: 'Описание', type: 'localeTextList' }),
+    defineField({
+      name: 'title',
+      title: 'Заглавие',
+      type: 'internationalizedArrayString',
+    }),
+    defineField({
+      name: 'summary',
+      title: 'Кратко описание',
+      type: 'internationalizedArrayText',
+    }),
+    defineField({
+      name: 'body',
+      title: 'Описание',
+      type: 'internationalizedArrayTextList',
+    }),
     defineField({
       name: 'inclusions',
       title: 'Какво включва',
-      type: 'localeStringList',
+      type: 'internationalizedArrayStringList',
     }),
     defineField({
       name: 'image',
@@ -107,7 +120,7 @@ export const service = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title.bg', media: 'image', subtitle: 'key' },
+    select: { title: 'title.0.value', media: 'image', subtitle: 'key' },
   },
 });
 
@@ -123,7 +136,11 @@ export const pricePackage = defineType({
       type: 'string',
       validation: (rule) => rule.required(),
     }),
-    defineField({ name: 'name', title: 'Име', type: 'localeString' }),
+    defineField({
+      name: 'name',
+      title: 'Име',
+      type: 'internationalizedArrayString',
+    }),
     defineField({
       name: 'priceEur',
       title: 'Цена в евро',
@@ -140,7 +157,7 @@ export const pricePackage = defineType({
     defineField({
       name: 'features',
       title: 'Какво включва',
-      type: 'localeStringList',
+      type: 'internationalizedArrayStringList',
     }),
     defineField({
       name: 'highlighted',
@@ -150,7 +167,7 @@ export const pricePackage = defineType({
     }),
   ],
   preview: {
-    select: { title: 'name.bg', subtitle: 'priceEur' },
+    select: { title: 'name.0.value', subtitle: 'priceEur' },
     prepare: ({ title, subtitle }) => ({
       title,
       subtitle: subtitle ? `${subtitle} EUR` : undefined,
@@ -170,7 +187,11 @@ export const addon = defineType({
       type: 'string',
       validation: (rule) => rule.required(),
     }),
-    defineField({ name: 'name', title: 'Име', type: 'localeString' }),
+    defineField({
+      name: 'name',
+      title: 'Име',
+      type: 'internationalizedArrayString',
+    }),
     defineField({
       name: 'priceEur',
       title: 'Цена в евро',
@@ -185,7 +206,7 @@ export const addon = defineType({
     }),
   ],
   preview: {
-    select: { title: 'name.bg', subtitle: 'priceEur' },
+    select: { title: 'name.0.value', subtitle: 'priceEur' },
     prepare: ({ title, subtitle }) => ({
       title,
       subtitle: subtitle ? `${subtitle} EUR` : undefined,
@@ -200,12 +221,6 @@ export const galleryItem = defineType({
   fields: [
     placeholderField,
     defineField({
-      name: 'key',
-      title: 'Ключ',
-      type: 'string',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: 'image',
       title: 'Снимка',
       type: 'image',
@@ -215,10 +230,9 @@ export const galleryItem = defineType({
     defineField({
       name: 'alt',
       title: 'Описание на снимката',
-      type: 'localeString',
+      type: 'internationalizedArrayString',
       description:
         'Кратко описание за хора, които използват екранен четец. Задължително.',
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'service',
@@ -230,7 +244,7 @@ export const galleryItem = defineType({
     defineField({ name: 'venue', title: 'Локация', type: 'string' }),
   ],
   preview: {
-    select: { title: 'alt.bg', media: 'image', subtitle: 'service.title.bg' },
+    select: { title: 'alt.0.value', media: 'image', subtitle: 'venue' },
   },
 });
 
@@ -240,12 +254,6 @@ export const mix = defineType({
   type: 'document',
   fields: [
     placeholderField,
-    defineField({
-      name: 'key',
-      title: 'Ключ',
-      type: 'string',
-      validation: (rule) => rule.required(),
-    }),
     defineField({
       name: 'title',
       title: 'Заглавие',
@@ -278,7 +286,11 @@ export const mix = defineType({
       type: 'number',
       validation: (rule) => rule.min(0),
     }),
-    defineField({ name: 'genres', title: 'Жанрове', type: 'localeStringList' }),
+    defineField({
+      name: 'genres',
+      title: 'Жанрове',
+      type: 'internationalizedArrayStringList',
+    }),
   ],
   preview: { select: { title: 'title', subtitle: 'platform' } },
 });
@@ -289,12 +301,6 @@ export const testimonial = defineType({
   type: 'document',
   fields: [
     placeholderField,
-    defineField({
-      name: 'key',
-      title: 'Ключ',
-      type: 'string',
-      validation: (rule) => rule.required(),
-    }),
     defineField({
       name: 'author',
       title: 'Име на клиента',
@@ -314,7 +320,11 @@ export const testimonial = defineType({
       type: 'date',
       validation: (rule) => rule.required(),
     }),
-    defineField({ name: 'quote', title: 'Отзив', type: 'localeText' }),
+    defineField({
+      name: 'quote',
+      title: 'Отзив',
+      type: 'internationalizedArrayText',
+    }),
     defineField({
       name: 'rating',
       title: 'Оценка',
@@ -323,7 +333,7 @@ export const testimonial = defineType({
       validation: (rule) => rule.required().min(1).max(5).integer(),
     }),
   ],
-  preview: { select: { title: 'author', subtitle: 'service.title.bg' } },
+  preview: { select: { title: 'author', subtitle: 'date' } },
 });
 
 export const faq = defineType({
@@ -333,13 +343,21 @@ export const faq = defineType({
   fields: [
     placeholderField,
     defineField({
-      name: 'key',
-      title: 'Ключ',
-      type: 'string',
-      validation: (rule) => rule.required(),
+      name: 'question',
+      title: 'Въпрос',
+      type: 'internationalizedArrayString',
     }),
-    defineField({ name: 'question', title: 'Въпрос', type: 'localeString' }),
-    defineField({ name: 'answer', title: 'Отговор', type: 'localeText' }),
+    defineField({
+      name: 'answer',
+      title: 'Отговор',
+      type: 'internationalizedArrayText',
+    }),
+    defineField({
+      name: 'order',
+      title: 'Подредба',
+      type: 'number',
+      initialValue: 1,
+    }),
   ],
-  preview: { select: { title: 'question.bg' } },
+  preview: { select: { title: 'question.0.value' } },
 });

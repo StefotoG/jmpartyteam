@@ -1,10 +1,4 @@
-import {
-  localeString,
-  localeText,
-  localeStringList,
-  localeTextList,
-  localeSlug,
-} from './localeTypes';
+import { stringList, textList } from './localeTypes';
 import {
   siteSettings,
   service,
@@ -17,11 +11,8 @@ import {
 } from './documents';
 
 export const schemaTypes = [
-  localeString,
-  localeText,
-  localeStringList,
-  localeTextList,
-  localeSlug,
+  stringList,
+  textList,
   siteSettings,
   service,
   pricePackage,

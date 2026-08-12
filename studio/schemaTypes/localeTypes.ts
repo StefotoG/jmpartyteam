@@ -1,104 +1,28 @@
-import { defineType, defineField } from 'sanity';
+import { defineType, defineField, defineArrayMember } from 'sanity';
+
+export const LANGUAGES = [
+  { id: 'bg', title: 'Български' },
+  { id: 'en', title: 'English' },
+];
 
 /**
- * Localized field primitives. Bulgarian is the source language — the EN variant of a
- * document is a translation of it, so BG is the field that carries validation.
+ * Wrapper types registered with sanity-plugin-internationalized-array. The plugin only
+ * localizes registered types and ships no list type, so bullet lists and multi-paragraph
+ * bodies need these.
  */
 
-export const localeString = defineType({
-  name: 'localeString',
-  title: 'Text',
-  type: 'object',
-  options: { columns: 2 },
-  fields: [
-    defineField({
-      name: 'bg',
-      title: 'Български',
-      type: 'string',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({ name: 'en', title: 'English', type: 'string' }),
-  ],
+export const stringList = defineType({
+  name: 'stringList',
+  title: 'Списък',
+  type: 'array',
+  of: [defineArrayMember({ type: 'string' })],
 });
 
-export const localeText = defineType({
-  name: 'localeText',
-  title: 'Paragraph',
-  type: 'object',
-  fields: [
-    defineField({
-      name: 'bg',
-      title: 'Български',
-      type: 'text',
-      rows: 3,
-      validation: (rule) => rule.required(),
-    }),
-    defineField({ name: 'en', title: 'English', type: 'text', rows: 3 }),
-  ],
-});
-
-export const localeStringList = defineType({
-  name: 'localeStringList',
-  title: 'List',
-  type: 'object',
-  fields: [
-    defineField({
-      name: 'bg',
-      title: 'Български',
-      type: 'array',
-      of: [{ type: 'string' }],
-      validation: (rule) => rule.required().min(1),
-    }),
-    defineField({
-      name: 'en',
-      title: 'English',
-      type: 'array',
-      of: [{ type: 'string' }],
-    }),
-  ],
-});
-
-export const localeTextList = defineType({
-  name: 'localeTextList',
-  title: 'Paragraphs',
-  type: 'object',
-  fields: [
-    defineField({
-      name: 'bg',
-      title: 'Български',
-      type: 'array',
-      of: [{ type: 'text', rows: 4 }],
-      validation: (rule) => rule.required().min(1),
-    }),
-    defineField({
-      name: 'en',
-      title: 'English',
-      type: 'array',
-      of: [{ type: 'text', rows: 4 }],
-    }),
-  ],
-});
-
-export const localeSlug = defineType({
-  name: 'localeSlug',
-  title: 'URL slug',
-  type: 'object',
-  options: { columns: 2 },
-  fields: [
-    defineField({
-      name: 'bg',
-      title: 'Български (латиница)',
-      type: 'slug',
-      description: 'Например: svatbi',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'en',
-      title: 'English',
-      type: 'slug',
-      validation: (rule) => rule.required(),
-    }),
-  ],
+export const textList = defineType({
+  name: 'textList',
+  title: 'Абзаци',
+  type: 'array',
+  of: [defineArrayMember({ type: 'text', rows: 4 })],
 });
 
 /** Flags seeded content. The production build refuses to deploy while any remain. */
