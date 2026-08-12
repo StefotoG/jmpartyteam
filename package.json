@@ -12,6 +12,7 @@
     "check": "astro check",
     "placeholders": "node scripts/generate-placeholders.mjs",
     "seed": "node scripts/seed-sanity.mjs",
+    "deploy": "netlify deploy --build --prod",
     "astro": "astro"
   },
   "dependencies": {
