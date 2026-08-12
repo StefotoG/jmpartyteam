@@ -15,7 +15,7 @@ export const placeholderContent: SiteContent = {
     phoneSecondary: '+359 88 111 1111',
     viber: '+359880000000',
     whatsapp: '+359880000000',
-    email: 'bookings@jmpartyteam.com',
+    email: 'jmpartyteam@gmail.com',
     instagram: 'https://instagram.com/',
     facebook: 'https://facebook.com/',
     tiktok: 'https://tiktok.com/',
