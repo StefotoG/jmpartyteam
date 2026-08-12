@@ -24,12 +24,38 @@ behaviour, not a bug.
 ## Content
 
 Until `SANITY_PROJECT_ID` is set, all content is read from
-[`src/content/placeholder.ts`](src/content/placeholder.ts). That file is also the intended
-input for the Sanity seed script, so the two stay in sync.
+[`src/content/placeholder.ts`](src/content/placeholder.ts). That file is also the input for
+the seed script, so the two stay in sync.
 
 Every seeded document carries `isPlaceholder: true`. Setting `REQUIRE_REAL_CONTENT=true`
 makes the build **fail** while any flagged document remains. Set it on the production
 Netlify context so seeded copy can never reach real customers.
+
+### Setting up Sanity
+
+The Studio lives in [`studio/`](studio) as its own package and deploys as a **separate**
+Netlify site, so its React bundle never enters the marketing site's build.
+
+```bash
+cd studio
+npm install
+npx sanity login
+npx sanity init --project-plan free   # creates the project, prints the project ID
+```
+
+Then set `SANITY_STUDIO_PROJECT_ID` (studio) and `SANITY_PROJECT_ID` (site), and seed the
+dataset with the placeholder content so the DJs open a populated Studio rather than a blank one:
+
+```bash
+SANITY_PROJECT_ID=xxx SANITY_WRITE_TOKEN=yyy npm run seed
+```
+
+Create the write token under **Sanity → API → Tokens → Editor**. It is only needed locally
+for seeding; never add it to Netlify.
+
+Finally, add a Sanity webhook pointing at a Netlify build hook so publishing content
+triggers a redeploy, and add `https://studio.jmpartyteam.com` to the project's CORS origins
+with credentials allowed.
 
 ## Environment
 
