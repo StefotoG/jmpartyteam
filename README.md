@@ -85,3 +85,4 @@ an empty grid that would imply every date is free.
 - [ ] Confirm the BGN dual-display obligation has lapsed (prices are EUR-only)
 - [ ] Choose www or apex as canonical and redirect the other
 - [ ] Test in the Instagram and Facebook in-app browsers on a real phone
+# jmpartyteam
