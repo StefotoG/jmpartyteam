@@ -1,0 +1,197 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { useTranslations } from '../../i18n/ui';
+import { getSiteContent } from '../../lib/content';
+import { formatEur } from '../../lib/money';
+import { localePath, type Locale } from '../../i18n/routes';
+import type { Service } from '../../lib/types';
+
+interface Props {
+  lang: Locale;
+  service: Service;
+}
+
+const { lang, service } = Astro.props;
+const t = useTranslations(lang);
+const { packages, testimonials, gallery } = await getSiteContent();
+
+const copy = {
+  bg: {
+    includes: 'Какво включва',
+    relatedTitle: 'Отзиви за подобни събития',
+    galleryTitle: 'Снимки от такива събития',
+    ctaTitle: 'Проверете дали сме свободни',
+    ctaLead: 'Пишете ни с датата и локацията — отговаряме до 24 часа.',
+    from: 'Пакети от',
+  },
+  en: {
+    includes: 'What is included',
+    relatedTitle: 'Reviews from similar events',
+    galleryTitle: 'Photos from events like this',
+    ctaTitle: 'Check whether we are free',
+    ctaLead: 'Send us the date and location — we reply within 24 hours.',
+    from: 'Packages from',
+  },
+}[lang];
+
+const related = testimonials.filter((item) => item.serviceKey === service.key);
+const relatedGallery = gallery
+  .filter((item) => item.serviceKey === service.key)
+  .slice(0, 3);
+const cheapest = packages.reduce((min, current) =>
+  current.priceEur < min.priceEur ? current : min
+);
+
+const title = `${service.title[lang]} — ${lang === 'bg' ? 'DJ и озвучаване' : 'DJ and sound'} | JM Party Team`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.title[lang],
+  description: service.summary[lang],
+  serviceType: service.title[lang],
+  provider: { '@id': `${Astro.site}#business` },
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'EUR',
+    price: cheapest.priceEur,
+    availability: 'https://schema.org/InStock',
+  },
+};
+---
+
+<Base
+  lang={lang}
+  routeKey="services"
+  slugs={{ bg: service.slug.bg, en: service.slug.en }}
+  title={title}
+  description={service.summary[lang]}
+  ogImage={service.image}
+  jsonLd={jsonLd}
+>
+  <section class="relative isolate overflow-hidden border-b border-line">
+    <img
+      src={service.image}
+      alt=""
+      width="1200"
+      height="800"
+      fetchpriority="high"
+      decoding="async"
+      class="absolute inset-0 -z-10 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 -z-10 bg-ink/75"></div>
+    <div class="mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">
+      <nav aria-label="Breadcrumb" class="text-sm text-muted">
+        <a href={localePath(lang, 'services')} class="hover:text-text">
+          {t('nav.services')}
+        </a>
+        <span aria-hidden="true"> / </span>
+        <span class="text-text">{service.title[lang]}</span>
+      </nav>
+      <h1 class="mt-4 text-4xl font-extrabold tracking-tight md:text-5xl">
+        {service.title[lang]}
+      </h1>
+      <p class="mt-5 max-w-2xl text-lg text-muted">{service.summary[lang]}</p>
+      <a
+        href={localePath(lang, 'contact')}
+        class="mt-8 inline-block rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+      >
+        {t('cta.book')}
+      </a>
+    </div>
+  </section>
+
+  <Section>
+    <div class="grid gap-12 md:grid-cols-3">
+      <div class="md:col-span-2">
+        {
+          service.body[lang].map((paragraph) => (
+            <p class="mb-5 text-lg text-muted">{paragraph}</p>
+          ))
+        }
+      </div>
+
+      <aside class="rounded-2xl border border-line bg-surface p-6">
+        <h2 class="text-lg font-bold">{copy.includes}</h2>
+        <ul class="mt-4 grid gap-2.5 text-sm">
+          {
+            service.inclusions[lang].map((item) => (
+              <li class="flex gap-2 text-muted">
+                <span class="text-accent" aria-hidden="true">
+                  ✓
+                </span>
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-6 border-t border-line pt-5 text-sm text-muted">
+          {copy.from}
+          <span class="ml-1 text-xl font-bold text-accent">
+            {formatEur(cheapest.priceEur, lang)}
+          </span>
+        </p>
+        <a
+          href={localePath(lang, 'pricing')}
+          class="mt-4 inline-block text-sm font-semibold text-accent underline underline-offset-4"
+        >
+          {t('nav.pricing')}
+        </a>
+      </aside>
+    </div>
+  </Section>
+
+  {
+    relatedGallery.length > 0 && (
+      <Section tone="surface" title={copy.galleryTitle}>
+        <ul class="grid grid-cols-2 gap-3 md:grid-cols-3">
+          {relatedGallery.map((item) => (
+            <li class="overflow-hidden rounded-xl border border-line">
+              <img
+                src={item.image}
+                alt={item.alt[lang]}
+                width={item.width}
+                height={item.height}
+                loading="lazy"
+                decoding="async"
+                class="aspect-square w-full object-cover"
+              />
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
+
+  {
+    related.length > 0 && (
+      <Section title={copy.relatedTitle}>
+        <ul class="grid gap-5 md:grid-cols-2">
+          {related.map((testimonial) => (
+            <li class="rounded-2xl border border-line bg-surface p-6">
+              <p class="text-accent" aria-label={`${testimonial.rating}/5`}>
+                {'★'.repeat(testimonial.rating)}
+              </p>
+              <blockquote class="mt-3 text-muted">
+                „{testimonial.quote[lang]}“
+              </blockquote>
+              <p class="mt-4 text-sm font-semibold">{testimonial.author}</p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
+
+  <Section tone="surface" align="center" title={copy.ctaTitle} lead={copy.ctaLead}>
+    <div class="flex justify-center">
+      <a
+        href={localePath(lang, 'contact')}
+        class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+      >
+        {t('cta.book')}
+      </a>
+    </div>
+  </Section>
+</Base>

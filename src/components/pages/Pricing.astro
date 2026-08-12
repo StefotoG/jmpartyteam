@@ -1,0 +1,159 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { useTranslations } from '../../i18n/ui';
+import { getSiteContent } from '../../lib/content';
+import { formatEur } from '../../lib/money';
+import { localePath, type Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const { packages, addons } = await getSiteContent();
+
+const copy = {
+  bg: {
+    title: 'Цени и пакети | JM Party Team',
+    description:
+      'Начални цени за диджей, озвучаване и осветление. Пакети за сватби, балове и корпоративни събития.',
+    heading: 'Пакети и цени',
+    lead: 'Всеки пакет може да се адаптира. Кажете ни какво ви трябва и ще направим оферта.',
+    addonsTitle: 'Допълнения',
+    addonsLead: 'Добавете само това, което ви трябва.',
+    popular: 'Най-избиран',
+    ctaTitle: 'Искате точна оферта?',
+    ctaLead: 'Изпратете детайлите за събитието и ще изчислим цената.',
+  },
+  en: {
+    title: 'Pricing and packages | JM Party Team',
+    description:
+      'Starting prices for DJ, sound and lighting. Packages for weddings, proms and corporate events.',
+    heading: 'Packages and pricing',
+    lead: 'Every package can be adapted. Tell us what you need and we will quote for it.',
+    addonsTitle: 'Add-ons',
+    addonsLead: 'Add only what you actually need.',
+    popular: 'Most chosen',
+    ctaTitle: 'Want an exact quote?',
+    ctaLead: 'Send us the event details and we will calculate the price.',
+  },
+}[lang];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'OfferCatalog',
+  name: copy.heading,
+  itemListElement: packages.map((pkg) => ({
+    '@type': 'Offer',
+    name: pkg.name[lang],
+    priceCurrency: 'EUR',
+    price: pkg.priceEur,
+    priceSpecification: {
+      '@type': 'PriceSpecification',
+      priceCurrency: 'EUR',
+      price: pkg.priceEur,
+      minPrice: pkg.isFrom ? pkg.priceEur : undefined,
+    },
+  })),
+};
+---
+
+<Base
+  lang={lang}
+  routeKey="pricing"
+  title={copy.title}
+  description={copy.description}
+  jsonLd={jsonLd}
+>
+  <Section title={copy.heading} lead={copy.lead}>
+    <ul class="grid gap-6 lg:grid-cols-3">
+      {
+        packages.map((pkg) => (
+          <li
+            class:list={[
+              'relative flex flex-col rounded-2xl border p-7',
+              pkg.highlighted
+                ? 'border-accent bg-surface'
+                : 'border-line bg-surface',
+            ]}
+          >
+            {pkg.highlighted && (
+              <span class="absolute -top-3 left-7 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-ink">
+                {copy.popular}
+              </span>
+            )}
+
+            <h2 class="text-xl font-bold">{pkg.name[lang]}</h2>
+
+            <p class="mt-4">
+              {pkg.isFrom && (
+                <span class="text-sm text-muted">{t('pricing.from')} </span>
+              )}
+              <span class="font-display text-4xl font-extrabold text-accent">
+                {formatEur(pkg.priceEur, lang)}
+              </span>
+            </p>
+
+            <ul class="mt-6 grid gap-2.5 text-sm text-muted">
+              {pkg.features[lang].map((feature) => (
+                <li class="flex gap-2">
+                  <span class="text-accent" aria-hidden="true">
+                    ✓
+                  </span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            <a
+              href={localePath(lang, 'contact')}
+              class:list={[
+                'mt-8 rounded-xl px-5 py-3 text-center font-bold transition-colors',
+                pkg.highlighted
+                  ? 'bg-accent text-accent-ink hover:bg-accent-hover'
+                  : 'border border-line text-text hover:border-accent',
+              ]}
+            >
+              {t('cta.book')}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="mt-8 text-sm text-muted">{t('pricing.note')}</p>
+  </Section>
+
+  <Section tone="surface" title={copy.addonsTitle} lead={copy.addonsLead}>
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        addons.map((addon) => (
+          <li class="flex items-center justify-between gap-4 rounded-xl border border-line bg-ink px-5 py-4">
+            <span class="font-medium">{addon.name[lang]}</span>
+            <span class="whitespace-nowrap font-bold text-accent">
+              {addon.isFrom && (
+                <span class="text-xs font-normal text-muted">
+                  {t('pricing.from')}{' '}
+                </span>
+              )}
+              {formatEur(addon.priceEur, lang)}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section align="center" title={copy.ctaTitle} lead={copy.ctaLead}>
+    <div class="flex justify-center">
+      <a
+        href={localePath(lang, 'contact')}
+        class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+      >
+        {t('cta.book')}
+      </a>
+    </div>
+  </Section>
+</Base>

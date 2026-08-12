@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
+import { localePath } from '../i18n/routes';
+---
+
+<Base
+  lang="bg"
+  routeKey="home"
+  title="Страницата не е намерена | JM Party Team"
+  description="Търсената страница не съществува."
+>
+  <Section
+    align="center"
+    title="Страницата не е намерена"
+    lead="Възможно е връзката да е стара или адресът да е сгрешен."
+  >
+    <p class="mb-8 text-muted">
+      This page could not be found. Try the homepage instead.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3">
+      <a
+        href={localePath('bg', 'home')}
+        class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+      >
+        Начало
+      </a>
+      <a
+        href={localePath('bg', 'contact')}
+        class="rounded-xl border border-line px-6 py-3.5 font-semibold transition-colors hover:border-accent"
+      >
+        Контакти
+      </a>
+    </div>
+  </Section>
+</Base>

@@ -1,0 +1,230 @@
+---
+import { useTranslations } from '../i18n/ui';
+import { getSiteContent } from '../lib/content';
+import type { Locale } from '../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const { services } = await getSiteContent();
+
+const today = new Date().toISOString().slice(0, 10);
+const fieldClass =
+  'w-full rounded-xl border border-line bg-ink px-4 py-3 text-text placeholder:text-muted/60 focus:border-accent';
+const labelClass = 'mb-1.5 block text-sm font-semibold';
+---
+
+<form
+  name="booking"
+  method="POST"
+  data-netlify="true"
+  netlify-honeypot="bot-field"
+  id="booking-form"
+  class="grid gap-5"
+>
+  <input type="hidden" name="form-name" value="booking" />
+  <input type="hidden" name="locale" value={lang} />
+
+  <p hidden>
+    <label>
+      Do not fill this in
+      <input name="bot-field" tabindex="-1" autocomplete="off" />
+    </label>
+  </p>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label class={labelClass} for="name">{t('form.name')}</label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        required
+        autocomplete="name"
+        class={fieldClass}
+      />
+    </div>
+
+    <div>
+      <label class={labelClass} for="phone">{t('form.phone')}</label>
+      <input
+        id="phone"
+        name="phone"
+        type="tel"
+        required
+        autocomplete="tel"
+        inputmode="tel"
+        class={fieldClass}
+      />
+    </div>
+  </div>
+
+  <div>
+    <label class={labelClass} for="email">
+      {t('form.email')}
+      <span class="font-normal text-muted">({t('form.optional')})</span>
+    </label>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      autocomplete="email"
+      class={fieldClass}
+    />
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label class={labelClass} for="eventDate">{t('form.date')}</label>
+      <input
+        id="eventDate"
+        name="eventDate"
+        type="date"
+        required
+        min={today}
+        class={fieldClass}
+      />
+      <p id="date-warning" hidden class="mt-2 text-sm text-accent">
+        {t('form.dateTaken')}
+      </p>
+    </div>
+
+    <div>
+      <label class={labelClass} for="eventType">{t('form.eventType')}</label>
+      <select id="eventType" name="eventType" required class={fieldClass}>
+        {
+          services.map((service) => (
+            <option value={service.key}>{service.title[lang]}</option>
+          ))
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label class={labelClass} for="city">{t('form.city')}</label>
+      <input id="city" name="city" type="text" required class={fieldClass} />
+    </div>
+
+    <div>
+      <label class={labelClass} for="guests">
+        {t('form.guests')}
+        <span class="font-normal text-muted">({t('form.optional')})</span>
+      </label>
+      <input
+        id="guests"
+        name="guests"
+        type="number"
+        min="1"
+        max="2000"
+        inputmode="numeric"
+        class={fieldClass}
+      />
+    </div>
+  </div>
+
+  <div>
+    <label class={labelClass} for="message">
+      {t('form.message')}
+      <span class="font-normal text-muted">({t('form.optional')})</span>
+    </label>
+    <textarea id="message" name="message" rows="4" class={fieldClass}></textarea>
+  </div>
+
+  <label class="flex items-start gap-3 text-sm text-muted">
+    <input
+      type="checkbox"
+      name="consent"
+      required
+      value="yes"
+      class="mt-1 h-4 w-4 shrink-0 rounded border-line"
+    />
+    <span>{t('form.consent')}</span>
+  </label>
+
+  <div class="flex flex-wrap items-center gap-4">
+    <button
+      type="submit"
+      id="booking-submit"
+      data-label-submit={t('form.submit')}
+      data-label-sending={t('form.sending')}
+      data-label-success={t('form.success')}
+      data-label-error={t('form.error')}
+      class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover disabled:opacity-60"
+    >
+      {t('form.submit')}
+    </button>
+    <p
+      id="booking-feedback"
+      role="status"
+      aria-live="polite"
+      class="text-sm"
+    >
+    </p>
+  </div>
+</form>
+
+<script>
+  const form = document.getElementById('booking-form') as HTMLFormElement | null;
+  const submitButton = document.getElementById(
+    'booking-submit'
+  ) as HTMLButtonElement | null;
+  const feedback = document.getElementById('booking-feedback');
+  const dateInput = document.getElementById(
+    'eventDate'
+  ) as HTMLInputElement | null;
+  const dateWarning = document.getElementById('date-warning');
+
+  // Advisory only — the enquiry can still be sent for a date that looks taken.
+  if (dateInput && dateWarning) {
+    fetch('/api/availability')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!data || data.error) return;
+        const busy = new Set<string>(data.busyDates ?? []);
+        dateInput.addEventListener('change', () => {
+          dateWarning.hidden = !busy.has(dateInput.value);
+        });
+      })
+      .catch(() => {});
+  }
+
+  if (form && submitButton && feedback) {
+    const labels = submitButton.dataset;
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      submitButton.disabled = true;
+      feedback.className = 'text-sm text-muted';
+      feedback.textContent = labels.labelSending ?? '';
+      submitButton.textContent = labels.labelSending ?? '';
+
+      try {
+        const response = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(
+            new FormData(form) as unknown as Record<string, string>
+          ).toString(),
+        });
+        if (!response.ok) throw new Error(String(response.status));
+
+        form.reset();
+        feedback.className = 'text-sm font-semibold text-accent';
+        feedback.textContent = labels.labelSuccess ?? '';
+      } catch {
+        feedback.className = 'text-sm font-semibold text-accent';
+        feedback.textContent = labels.labelError ?? '';
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = labels.labelSubmit ?? '';
+      }
+    });
+  }
+</script>

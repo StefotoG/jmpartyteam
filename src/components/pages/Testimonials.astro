@@ -1,0 +1,68 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { getSiteContent } from '../../lib/content';
+import { formatDate } from '../../lib/money';
+import type { Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const { testimonials, services } = await getSiteContent();
+
+const copy = {
+  bg: {
+    title: 'Отзиви от клиенти | JM Party Team',
+    description:
+      'Какво казват младоженци, абитуриенти и организатори за нашата работа.',
+    heading: 'Отзиви',
+    lead: 'Всеки отзив е от реален клиент и реално събитие.',
+  },
+  en: {
+    title: 'Client reviews | JM Party Team',
+    description:
+      'What newlyweds, graduates and event organisers say about working with us.',
+    heading: 'Reviews',
+    lead: 'Every review comes from a real client and a real event.',
+  },
+}[lang];
+
+const serviceTitle = new Map(
+  services.map((service) => [service.key, service.title[lang]])
+);
+---
+
+<Base
+  lang={lang}
+  routeKey="testimonials"
+  title={copy.title}
+  description={copy.description}
+>
+  <Section title={copy.heading} lead={copy.lead}>
+    <ul class="grid gap-5 md:grid-cols-2">
+      {
+        testimonials.map((testimonial) => (
+          <li class="rounded-2xl border border-line bg-surface p-6">
+            <p class="text-accent" aria-label={`${testimonial.rating}/5`}>
+              {'★'.repeat(testimonial.rating)}
+            </p>
+            <blockquote class="mt-3 text-muted">
+              „{testimonial.quote[lang]}“
+            </blockquote>
+            <footer class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span class="font-semibold">{testimonial.author}</span>
+              <span class="text-muted">
+                {serviceTitle.get(testimonial.serviceKey)}
+              </span>
+              <span class="text-muted">
+                {formatDate(testimonial.date, lang)}
+              </span>
+            </footer>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+</Base>

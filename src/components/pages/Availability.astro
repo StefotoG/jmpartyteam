@@ -1,0 +1,59 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import AvailabilityCalendar from '../AvailabilityCalendar.astro';
+import { useTranslations } from '../../i18n/ui';
+import { localePath, type Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const copy = {
+  bg: {
+    title: 'Свободни дати | JM Party Team',
+    description:
+      'Вижте кои дати са заети и проверете дали сме свободни за вашето събитие.',
+    heading: 'Свободни дати',
+    lead: 'Календарът се обновява автоматично. Отбелязаните дати вече са заети.',
+    ctaTitle: 'Датата ви е свободна?',
+    ctaLead: 'Изпратете запитване и ще потвърдим в рамките на 24 часа.',
+  },
+  en: {
+    title: 'Availability | JM Party Team',
+    description:
+      'See which dates are already booked and check whether we are free for your event.',
+    heading: 'Availability',
+    lead: 'The calendar updates automatically. Highlighted dates are already booked.',
+    ctaTitle: 'Is your date free?',
+    ctaLead: 'Send an enquiry and we will confirm within 24 hours.',
+  },
+}[lang];
+---
+
+<Base
+  lang={lang}
+  routeKey="availability"
+  title={copy.title}
+  description={copy.description}
+>
+  <Section title={copy.heading} lead={copy.lead}>
+    <div class="max-w-2xl">
+      <AvailabilityCalendar lang={lang} />
+    </div>
+  </Section>
+
+  <Section tone="surface" align="center" title={copy.ctaTitle} lead={copy.ctaLead}>
+    <div class="flex justify-center">
+      <a
+        href={localePath(lang, 'contact')}
+        class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+      >
+        {t('cta.book')}
+      </a>
+    </div>
+  </Section>
+</Base>

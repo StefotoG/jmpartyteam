@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1200" viewBox="0 0 800 1200" role="img" aria-label="gallery 2">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10233f"/>
+      <stop offset="55%" stop-color="#1f5f7a"/>
+      <stop offset="100%" stop-color="#4bb3a5"/>
+    </linearGradient>
+    <radialGradient id="g1s" cx="0.7" cy="0.25" r="0.8">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="g1n">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+  <rect width="800" height="1200" fill="url(#g1)"/>
+  <rect width="800" height="1200" fill="url(#g1s)"/>
+  <rect width="800" height="1200" filter="url(#g1n)" opacity="0.12"/>
+  <rect x="0" y="660" width="800" height="540" fill="#000000" opacity="0.35"/>
+  <text x="400" y="600" fill="#ffffff" fill-opacity="0.72"
+        font-family="system-ui, sans-serif" font-size="44"
+        font-weight="600" text-anchor="middle" letter-spacing="2">PLACEHOLDER</text>
+  <text x="400" y="660" fill="#ffffff" fill-opacity="0.5"
+        font-family="system-ui, sans-serif" font-size="29"
+        text-anchor="middle">gallery 2</text>
+</svg>

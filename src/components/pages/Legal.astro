@@ -1,0 +1,200 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { getSiteContent } from '../../lib/content';
+import type { Locale, RouteKey } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+  doc: 'privacy' | 'terms';
+}
+
+const { lang, doc } = Astro.props;
+const { settings } = await getSiteContent();
+
+const documents = {
+  privacy: {
+    bg: {
+      title: 'Политика за поверителност | JM Party Team',
+      heading: 'Политика за поверителност',
+      lead: 'Как обработваме личните данни, които ни изпращате чрез този сайт.',
+      sections: [
+        {
+          h: 'Кой обработва данните ви',
+          p: [
+            `Администратор на лични данни е ${settings.brandName}. За въпроси относно обработката на вашите данни можете да ни пишете на ${settings.email}.`,
+          ],
+        },
+        {
+          h: 'Какви данни събираме',
+          p: [
+            'Чрез формата за запитване събираме име, телефон, по желание имейл, дата и вид на събитието, град или локация, приблизителен брой гости и текста на съобщението ви.',
+            'Не събираме данни чрез бисквитки за проследяване и не използваме рекламни профили.',
+          ],
+        },
+        {
+          h: 'Защо ги обработваме',
+          p: [
+            'Използваме данните единствено за да отговорим на запитването ви, да проверим наличност за посочената дата и да подготвим оферта. Основанието за обработка е вашето изрично съгласие, дадено при изпращане на формата.',
+          ],
+        },
+        {
+          h: 'Колко дълго ги съхраняваме',
+          p: [
+            'Съхраняваме запитванията до 12 месеца след последната комуникация. Ако бъде сключен договор, данните се пазят според законовите срокове за счетоводна документация.',
+          ],
+        },
+        {
+          h: 'На кого ги предоставяме',
+          p: [
+            'Данните от формата се обработват от нашия доставчик на хостинг услуги, който ги съхранява на сървъри в Европейския съюз. Не продаваме и не предоставяме данните ви на трети страни за маркетингови цели.',
+          ],
+        },
+        {
+          h: 'Вашите права',
+          p: [
+            'Имате право на достъп, коригиране, изтриване и ограничаване на обработката, както и право да оттеглите съгласието си по всяко време. За целта ни пишете на посочения имейл.',
+            'Имате право и на жалба до Комисията за защита на личните данни.',
+          ],
+        },
+      ],
+    },
+    en: {
+      title: 'Privacy policy | JM Party Team',
+      heading: 'Privacy policy',
+      lead: 'How we handle the personal data you send us through this website.',
+      sections: [
+        {
+          h: 'Who processes your data',
+          p: [
+            `The data controller is ${settings.brandName}. For any questions about how your data is processed, write to us at ${settings.email}.`,
+          ],
+        },
+        {
+          h: 'What we collect',
+          p: [
+            'Through the enquiry form we collect your name, phone number, optionally your email, the date and type of the event, the city or venue, an approximate guest count and your message.',
+            'We do not use tracking cookies and we do not build advertising profiles.',
+          ],
+        },
+        {
+          h: 'Why we process it',
+          p: [
+            'We use the data solely to answer your enquiry, check availability for the date you gave us and prepare a quote. The legal basis is the explicit consent you give when submitting the form.',
+          ],
+        },
+        {
+          h: 'How long we keep it',
+          p: [
+            'Enquiries are kept for up to 12 months after our last contact. If a contract is signed, data is retained for the statutory accounting periods.',
+          ],
+        },
+        {
+          h: 'Who we share it with',
+          p: [
+            'Form submissions are processed by our hosting provider and stored on servers within the European Union. We do not sell or share your data with third parties for marketing.',
+          ],
+        },
+        {
+          h: 'Your rights',
+          p: [
+            'You have the right to access, correct, delete and restrict processing of your data, and to withdraw consent at any time. Contact us at the email above.',
+            'You also have the right to lodge a complaint with the Bulgarian Commission for Personal Data Protection.',
+          ],
+        },
+      ],
+    },
+  },
+  terms: {
+    bg: {
+      title: 'Общи условия | JM Party Team',
+      heading: 'Общи условия',
+      lead: 'Условия за ползване на сайта и за резервация на нашите услуги.',
+      sections: [
+        {
+          h: 'Ползване на сайта',
+          p: [
+            'Съдържанието на този сайт е с информационен характер. Снимките и текстовете са наша собственост и не могат да бъдат използвани без разрешение.',
+          ],
+        },
+        {
+          h: 'Запитвания и оферти',
+          p: [
+            'Изпращането на запитване не представлява резервация. Датата се счита за запазена едва след писмено потвърждение от наша страна и заплатен депозит.',
+            'Посочените в сайта цени са начални и ориентировъчни. Крайната цена се определя в индивидуална оферта според датата, локацията, продължителността и избраните допълнения.',
+          ],
+        },
+        {
+          h: 'Календар за наличност',
+          p: [
+            'Календарът със свободни дати се обновява автоматично и има ориентировъчен характер. Възможно е да има кратко забавяне при обновяване, затова винаги потвърждавайте датата със запитване.',
+          ],
+        },
+        {
+          h: 'Отказ и промени',
+          p: [
+            'Условията за отказ, преместване на дата и връщане на депозит се уреждат в договора, който подписваме преди събитието.',
+          ],
+        },
+      ],
+    },
+    en: {
+      title: 'Terms and conditions | JM Party Team',
+      heading: 'Terms and conditions',
+      lead: 'Terms for using this website and for booking our services.',
+      sections: [
+        {
+          h: 'Using this website',
+          p: [
+            'The content of this website is informational. Photographs and text are our property and may not be reused without permission.',
+          ],
+        },
+        {
+          h: 'Enquiries and quotes',
+          p: [
+            'Sending an enquiry does not constitute a booking. A date is only held after written confirmation from us and a paid deposit.',
+            'Prices shown on this website are indicative starting prices. The final price is set in an individual quote based on date, location, duration and any add-ons.',
+          ],
+        },
+        {
+          h: 'Availability calendar',
+          p: [
+            'The availability calendar updates automatically and is indicative. There may be a short delay before it refreshes, so always confirm your date with an enquiry.',
+          ],
+        },
+        {
+          h: 'Cancellations and changes',
+          p: [
+            'Terms for cancellation, moving a date and deposit refunds are set out in the contract we sign before the event.',
+          ],
+        },
+      ],
+    },
+  },
+} as const;
+
+const copy = documents[doc][lang];
+const routeKey: RouteKey = doc;
+---
+
+<Base
+  lang={lang}
+  routeKey={routeKey}
+  title={copy.title}
+  description={copy.lead}
+>
+  <Section title={copy.heading} lead={copy.lead}>
+    <div class="max-w-3xl">
+      {
+        copy.sections.map((section) => (
+          <section class="mb-9">
+            <h2 class="text-xl font-bold">{section.h}</h2>
+            {section.p.map((paragraph) => (
+              <p class="mt-3 text-muted">{paragraph}</p>
+            ))}
+          </section>
+        ))
+      }
+    </div>
+  </Section>
+</Base>

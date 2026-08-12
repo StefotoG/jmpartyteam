@@ -1,0 +1,181 @@
+---
+import { useTranslations } from '../i18n/ui';
+import { getSiteContent } from '../lib/content';
+import {
+  DEFAULT_LOCALE,
+  localePath,
+  type Locale,
+  type RouteKey,
+} from '../i18n/routes';
+
+interface Props {
+  lang: Locale;
+  routeKey: RouteKey;
+  slugs?: Partial<Record<Locale, string>>;
+}
+
+const { lang, routeKey, slugs } = Astro.props;
+const t = useTranslations(lang);
+const { settings } = await getSiteContent();
+
+const navKeys = [
+  'services',
+  'gallery',
+  'music',
+  'pricing',
+  'availability',
+  'about',
+] as const satisfies readonly RouteKey[];
+
+const navLabel = {
+  services: t('nav.services'),
+  gallery: t('nav.gallery'),
+  music: t('nav.music'),
+  pricing: t('nav.pricing'),
+  availability: t('nav.availability'),
+  about: t('nav.about'),
+} as const;
+
+const otherLocale: Locale = lang === 'bg' ? 'en' : 'bg';
+const switchHref = localePath(otherLocale, routeKey, slugs?.[otherLocale]);
+const homeHref = localePath(lang, 'home');
+const contactHref = localePath(lang, 'contact');
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  class="sticky top-0 z-40 border-b border-line/60 bg-ink/85 backdrop-blur-md"
+>
+  <div class="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 md:px-6">
+    <a
+      href={homeHref}
+      class="font-display text-lg font-extrabold tracking-tight whitespace-nowrap"
+    >
+      <span class="text-text">JM</span>
+      <span class="text-accent">PARTY</span>
+      <span class="text-text">TEAM</span>
+    </a>
+
+    <nav
+      class="ml-auto hidden items-center gap-1 lg:flex"
+      aria-label={t('nav.menu')}
+    >
+      {
+        navKeys.map((key) => {
+          const href = localePath(lang, key);
+          const isCurrent = currentPath === href;
+          return (
+            <a
+              href={href}
+              aria-current={isCurrent ? 'page' : undefined}
+              class:list={[
+                'rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2',
+                isCurrent ? 'text-accent' : 'text-muted hover:text-text',
+              ]}
+            >
+              {navLabel[key]}
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <div class="ml-auto flex items-center gap-2 lg:ml-0">
+      <a
+        href={switchHref}
+        hreflang={otherLocale === DEFAULT_LOCALE ? 'bg-BG' : 'en'}
+        aria-label={t('lang.label')}
+        class="rounded-lg border border-line px-2.5 py-1.5 text-xs font-semibold text-muted transition-colors hover:border-accent hover:text-text"
+      >
+        {otherLocale.toUpperCase()}
+      </a>
+
+      <a
+        href={contactHref}
+        class="hidden rounded-lg bg-accent px-4 py-2 text-sm font-bold text-accent-ink transition-colors hover:bg-accent-hover sm:inline-block"
+      >
+        {t('cta.book')}
+      </a>
+
+      <button
+        type="button"
+        id="menu-toggle"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={t('nav.menu')}
+        class="rounded-lg border border-line p-2 text-text lg:hidden"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M3 6h18M3 12h18M3 18h18"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" hidden class="border-t border-line/60 lg:hidden">
+    <nav class="mx-auto max-w-6xl px-4 py-3" aria-label={t('nav.menu')}>
+      <ul class="grid gap-1">
+        {
+          navKeys.map((key) => (
+            <li>
+              <a
+                href={localePath(lang, key)}
+                class="block rounded-lg px-3 py-2.5 text-base font-medium text-text hover:bg-surface-2"
+              >
+                {navLabel[key]}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a
+            href={contactHref}
+            class="mt-1 block rounded-lg bg-accent px-3 py-2.5 text-center text-base font-bold text-accent-ink"
+          >
+            {t('cta.book')}
+          </a>
+        </li>
+        <li>
+          <a
+            href={`tel:${settings.phonePrimary.replace(/\s/g, '')}`}
+            class="block rounded-lg px-3 py-2.5 text-base font-medium text-muted"
+          >
+            {settings.phonePrimary}
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  if (toggle && menu) {
+    const setOpen = (open: boolean) => {
+      menu.toggleAttribute('hidden', !open);
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+
+    toggle.addEventListener('click', () => {
+      setOpen(menu.hasAttribute('hidden'));
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !menu.hasAttribute('hidden')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>

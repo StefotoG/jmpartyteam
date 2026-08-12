@@ -1,0 +1,17 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ServiceDetail from '../../components/pages/ServiceDetail.astro';
+import { getSiteContent } from '../../lib/content';
+
+export const getStaticPaths = (async () => {
+  const { services } = await getSiteContent();
+  return services.map((service) => ({
+    params: { slug: service.slug.bg },
+    props: { service },
+  }));
+}) satisfies GetStaticPaths;
+
+const { service } = Astro.props;
+---
+
+<ServiceDetail lang="bg" service={service} />

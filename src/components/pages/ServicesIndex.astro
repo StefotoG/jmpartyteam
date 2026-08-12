@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { getSiteContent } from '../../lib/content';
+import { localePath, type Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const { services } = await getSiteContent();
+
+const copy = {
+  bg: {
+    title: 'Услуги — DJ за сватби, балове и партита | JM Party Team',
+    description:
+      'Диджей услуги за сватби, абитуриентски балове, корпоративни събития, рождени дни, юбилеи и кръщенета в цяла България.',
+    heading: 'Услуги',
+    lead: 'Изберете вида събитие, за да видите какво включва нашата работа и какво получавате.',
+    includes: 'Включва',
+  },
+  en: {
+    title: 'Services — DJs for weddings, proms and parties | JM Party Team',
+    description:
+      'DJ services for weddings, proms, corporate events, birthdays, anniversaries and christenings across Bulgaria.',
+    heading: 'Services',
+    lead: 'Choose your type of event to see how we work and what is included.',
+    includes: 'Includes',
+  },
+}[lang];
+---
+
+<Base
+  lang={lang}
+  routeKey="services"
+  title={copy.title}
+  description={copy.description}
+>
+  <Section title={copy.heading} lead={copy.lead}>
+    <ul class="grid gap-6 md:grid-cols-2">
+      {
+        services.map((service) => (
+          <li class="overflow-hidden rounded-2xl border border-line bg-surface">
+            <a href={localePath(lang, 'services', service.slug[lang])}>
+              <img
+                src={service.image}
+                alt=""
+                width="1200"
+                height="800"
+                loading="lazy"
+                decoding="async"
+                class="aspect-[3/2] w-full object-cover"
+              />
+            </a>
+            <div class="p-6">
+              <h2 class="text-xl font-bold">
+                <a
+                  href={localePath(lang, 'services', service.slug[lang])}
+                  class="hover:text-accent"
+                >
+                  {service.title[lang]}
+                </a>
+              </h2>
+              <p class="mt-2 text-muted">{service.summary[lang]}</p>
+              <ul class="mt-4 grid gap-1.5 text-sm text-muted">
+                {service.inclusions[lang].slice(0, 3).map((item) => (
+                  <li class="flex gap-2">
+                    <span class="text-accent" aria-hidden="true">
+                      ✓
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+</Base>

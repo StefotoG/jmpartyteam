@@ -1,0 +1,285 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { useTranslations } from '../../i18n/ui';
+import { getSiteContent } from '../../lib/content';
+import { formatEur } from '../../lib/money';
+import { localePath, type Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const { settings, services, testimonials, gallery, packages } =
+  await getSiteContent();
+
+const copy = {
+  bg: {
+    title: 'DJ за сватби, балове и партита | JM Party Team',
+    description:
+      'Диджей дует с над 450 събития в цяла България. Озвучаване, осветление и музика за сватби, абитуриентски балове, корпоративни партита и юбилеи.',
+    heroKicker: 'Диджей дует · Цяла България',
+    heroTitle: 'Музика, на която\nвсички остават на дансинга',
+    heroLead:
+      'Двама диджеи, професионално озвучаване и програма, изградена около вашите гости. Работим за сватби, балове, корпоративни събития и семейни тържества.',
+    statsEvents: 'проведени събития',
+    statsYears: 'години опит',
+    statsRating: 'среден рейтинг',
+    servicesTitle: 'За какви събития свирим',
+    servicesLead:
+      'Всяко събитие има различен ритъм. Изберете вашето, за да видите какво включва.',
+    galleryTitle: 'От последните ни събития',
+    galleryLead: 'Снимки от зали, дансинги и моменти, които си заслужават.',
+    testimonialsTitle: 'Какво казват клиентите',
+    pricingTitle: 'Пакети и цени',
+    pricingLead:
+      'Прозрачни начални цени. Крайната оферта зависи от датата, локацията и продължителността.',
+    ctaTitle: 'Свободни ли сме за вашата дата?',
+    ctaLead:
+      'Проверете календара или ни пишете директно — отговаряме до 24 часа.',
+  },
+  en: {
+    title: 'DJs for weddings and parties in Bulgaria | JM Party Team',
+    description:
+      'A DJ duo with over 450 events across Bulgaria. Sound, lighting and music for weddings, proms, corporate parties and anniversaries.',
+    heroKicker: 'DJ duo · Across Bulgaria',
+    heroTitle: 'Music that keeps\neveryone on the dancefloor',
+    heroLead:
+      'Two DJs, professional sound and a programme built around your guests. We work weddings, proms, corporate events and family celebrations.',
+    statsEvents: 'events played',
+    statsYears: 'years of experience',
+    statsRating: 'average rating',
+    servicesTitle: 'Events we play',
+    servicesLead:
+      'Every event has a different rhythm. Pick yours to see what is included.',
+    galleryTitle: 'From our recent events',
+    galleryLead: 'Photos from venues, dancefloors and moments worth keeping.',
+    testimonialsTitle: 'What clients say',
+    pricingTitle: 'Packages and pricing',
+    pricingLead:
+      'Transparent starting prices. The final quote depends on date, location and duration.',
+    ctaTitle: 'Are we free on your date?',
+    ctaLead: 'Check the calendar or message us directly — we reply within 24 hours.',
+  },
+}[lang];
+
+const yearsActive = new Date().getFullYear() - settings.foundingYear;
+const featuredGallery = gallery.slice(0, 6);
+const cheapestPackage = packages.reduce((min, current) =>
+  current.priceEur < min.priceEur ? current : min
+);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': `${Astro.site}#business`,
+  name: settings.brandName,
+  description: copy.description,
+  url: Astro.site?.href,
+  email: settings.email,
+  telephone: settings.phonePrimary,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: settings.addressLocality[lang],
+    addressCountry: 'BG',
+  },
+  areaServed: settings.cities[lang].map((city) => ({
+    '@type': 'City',
+    name: city,
+  })),
+  priceRange: '€€',
+  foundingDate: String(settings.foundingYear),
+};
+---
+
+<Base
+  lang={lang}
+  routeKey="home"
+  title={copy.title}
+  description={copy.description}
+  jsonLd={jsonLd}
+>
+  <section class="relative isolate overflow-hidden">
+    <img
+      src="/placeholders/hero.svg"
+      alt=""
+      width="1920"
+      height="1080"
+      fetchpriority="high"
+      decoding="async"
+      class="absolute inset-0 -z-10 h-full w-full object-cover"
+    />
+    <div
+      class="absolute inset-0 -z-10 bg-gradient-to-b from-ink/70 via-ink/80 to-ink"
+    >
+    </div>
+
+    <div class="mx-auto max-w-6xl px-4 py-24 md:px-6 md:py-36">
+      <p
+        class="text-sm font-semibold tracking-widest text-accent uppercase"
+      >
+        {copy.heroKicker}
+      </p>
+      <h1
+        class="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight whitespace-pre-line md:text-6xl"
+      >
+        {copy.heroTitle}
+      </h1>
+      <p class="mt-6 max-w-xl text-lg text-muted md:text-xl">
+        {copy.heroLead}
+      </p>
+
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a
+          href={localePath(lang, 'contact')}
+          class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+        >
+          {t('cta.book')}
+        </a>
+        <a
+          href={localePath(lang, 'availability')}
+          class="rounded-xl border border-line px-6 py-3.5 font-semibold text-text transition-colors hover:border-accent"
+        >
+          {t('cta.checkDate')}
+        </a>
+      </div>
+
+      <dl class="mt-14 grid max-w-lg grid-cols-3 gap-6">
+        <div>
+          <dt class="sr-only">{copy.statsEvents}</dt>
+          <dd class="font-display text-3xl font-extrabold text-accent">
+            {settings.eventsCompleted}+
+          </dd>
+          <p class="mt-1 text-sm text-muted">{copy.statsEvents}</p>
+        </div>
+        <div>
+          <dt class="sr-only">{copy.statsYears}</dt>
+          <dd class="font-display text-3xl font-extrabold text-accent">
+            {yearsActive}
+          </dd>
+          <p class="mt-1 text-sm text-muted">{copy.statsYears}</p>
+        </div>
+        <div>
+          <dt class="sr-only">{copy.statsRating}</dt>
+          <dd class="font-display text-3xl font-extrabold text-accent">5.0</dd>
+          <p class="mt-1 text-sm text-muted">{copy.statsRating}</p>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <Section
+    tone="surface"
+    title={copy.servicesTitle}
+    lead={copy.servicesLead}
+  >
+    <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        services.map((service) => (
+          <li>
+            <a
+              href={localePath(lang, 'services', service.slug[lang])}
+              class="group block h-full overflow-hidden rounded-2xl border border-line bg-ink transition-colors hover:border-accent"
+            >
+              <img
+                src={service.image}
+                alt=""
+                width="1200"
+                height="800"
+                loading="lazy"
+                decoding="async"
+                class="aspect-[3/2] w-full object-cover"
+              />
+              <div class="p-5">
+                <h3 class="text-lg font-bold group-hover:text-accent">
+                  {service.title[lang]}
+                </h3>
+                <p class="mt-2 text-sm text-muted">{service.summary[lang]}</p>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section title={copy.galleryTitle} lead={copy.galleryLead}>
+    <ul class="grid grid-cols-2 gap-3 md:grid-cols-3">
+      {
+        featuredGallery.map((item) => (
+          <li class="overflow-hidden rounded-xl border border-line">
+            <img
+              src={item.image}
+              alt={item.alt[lang]}
+              width={item.width}
+              height={item.height}
+              loading="lazy"
+              decoding="async"
+              class="aspect-square w-full object-cover"
+            />
+          </li>
+        ))
+      }
+    </ul>
+    <div class="mt-8">
+      <a
+        href={localePath(lang, 'gallery')}
+        class="inline-block rounded-xl border border-line px-5 py-3 font-semibold transition-colors hover:border-accent"
+      >
+        {t('cta.seeAll')}
+      </a>
+    </div>
+  </Section>
+
+  <Section tone="surface" title={copy.testimonialsTitle}>
+    <ul class="grid gap-5 md:grid-cols-2">
+      {
+        testimonials.slice(0, 4).map((testimonial) => (
+          <li class="rounded-2xl border border-line bg-ink p-6">
+            <p class="text-accent" aria-label={`${testimonial.rating}/5`}>
+              {'★'.repeat(testimonial.rating)}
+            </p>
+            <blockquote class="mt-3 text-muted">
+              „{testimonial.quote[lang]}“
+            </blockquote>
+            <p class="mt-4 text-sm font-semibold">{testimonial.author}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section title={copy.pricingTitle} lead={copy.pricingLead}>
+    <p class="text-2xl font-bold">
+      {t('pricing.from')}
+      <span class="text-accent">{formatEur(cheapestPackage.priceEur, lang)}</span>
+    </p>
+    <div class="mt-6">
+      <a
+        href={localePath(lang, 'pricing')}
+        class="inline-block rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+      >
+        {t('nav.pricing')}
+      </a>
+    </div>
+  </Section>
+
+  <Section tone="surface" align="center" title={copy.ctaTitle} lead={copy.ctaLead}>
+    <div class="flex flex-wrap justify-center gap-3">
+      <a
+        href={localePath(lang, 'contact')}
+        class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+      >
+        {t('cta.book')}
+      </a>
+      <a
+        href={`tel:${settings.phonePrimary.replace(/\s/g, '')}`}
+        class="rounded-xl border border-line px-6 py-3.5 font-semibold transition-colors hover:border-accent"
+      >
+        {settings.phonePrimary}
+      </a>
+    </div>
+  </Section>
+</Base>

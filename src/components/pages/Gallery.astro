@@ -1,0 +1,118 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { getSiteContent } from '../../lib/content';
+import type { Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const { gallery, services } = await getSiteContent();
+
+const copy = {
+  bg: {
+    title: 'Галерия от събития | JM Party Team',
+    description:
+      'Снимки от сватби, абитуриентски балове, корпоративни партита и семейни тържества.',
+    heading: 'Галерия',
+    lead: 'Моменти от дансинга, залата и техниката ни в действие.',
+    all: 'Всички',
+  },
+  en: {
+    title: 'Event gallery | JM Party Team',
+    description:
+      'Photos from weddings, proms, corporate parties and family celebrations.',
+    heading: 'Gallery',
+    lead: 'Moments from the dancefloor, the venue and our setup in action.',
+    all: 'All',
+  },
+}[lang];
+---
+
+<Base
+  lang={lang}
+  routeKey="gallery"
+  title={copy.title}
+  description={copy.description}
+>
+  <Section title={copy.heading} lead={copy.lead}>
+    <div
+      class="mb-8 flex flex-wrap gap-2"
+      role="group"
+      aria-label={copy.heading}
+    >
+      <button
+        type="button"
+        data-filter="all"
+        aria-pressed="true"
+        class="gallery-filter rounded-full border border-accent bg-accent px-4 py-2 text-sm font-semibold text-accent-ink"
+      >
+        {copy.all}
+      </button>
+      {
+        services.map((service) => (
+          <button
+            type="button"
+            data-filter={service.key}
+            aria-pressed="false"
+            class="gallery-filter rounded-full border border-line px-4 py-2 text-sm font-semibold text-muted hover:border-accent hover:text-text"
+          >
+            {service.title[lang]}
+          </button>
+        ))
+      }
+    </div>
+
+    <ul id="gallery-grid" class="grid grid-cols-2 gap-3 md:grid-cols-3">
+      {
+        gallery.map((item) => (
+          <li
+            data-service={item.serviceKey}
+            class="overflow-hidden rounded-xl border border-line"
+          >
+            <img
+              src={item.image}
+              alt={item.alt[lang]}
+              width={item.width}
+              height={item.height}
+              loading="lazy"
+              decoding="async"
+              class="aspect-square w-full object-cover"
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+</Base>
+
+<script>
+  const buttons =
+    document.querySelectorAll<HTMLButtonElement>('.gallery-filter');
+  const items = document.querySelectorAll<HTMLLIElement>(
+    '#gallery-grid > li'
+  );
+
+  const active =
+    'rounded-full border border-accent bg-accent px-4 py-2 text-sm font-semibold text-accent-ink';
+  const inactive =
+    'rounded-full border border-line px-4 py-2 text-sm font-semibold text-muted hover:border-accent hover:text-text';
+
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      const filter = button.dataset.filter;
+
+      for (const other of buttons) {
+        const isActive = other === button;
+        other.setAttribute('aria-pressed', String(isActive));
+        other.className = `gallery-filter ${isActive ? active : inactive}`;
+      }
+
+      for (const item of items) {
+        item.hidden = filter !== 'all' && item.dataset.service !== filter;
+      }
+    });
+  }
+</script>

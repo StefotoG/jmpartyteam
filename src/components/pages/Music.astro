@@ -1,0 +1,101 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { getSiteContent } from '../../lib/content';
+import type { Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const { mixes } = await getSiteContent();
+
+const copy = {
+  bg: {
+    title: 'Музика и миксове | JM Party Team',
+    description:
+      'Чуйте наши миксове за сватби, партита и ретро вечери. Поп, денс, хаус, български хитове.',
+    heading: 'Музика',
+    lead: 'Няколко микса, които показват как звучи една наша вечер.',
+    minutes: 'мин',
+    placeholderNote: 'Миксът ще бъде добавен скоро.',
+  },
+  en: {
+    title: 'Music and mixes | JM Party Team',
+    description:
+      'Listen to our mixes for weddings, parties and retro nights. Pop, dance, house, Bulgarian hits.',
+    heading: 'Music',
+    lead: 'A few mixes that show how one of our nights sounds.',
+    minutes: 'min',
+    placeholderNote: 'This mix will be added soon.',
+  },
+}[lang];
+---
+
+<Base lang={lang} routeKey="music" title={copy.title} description={copy.description}>
+  <Section title={copy.heading} lead={copy.lead}>
+    <ul class="grid gap-5 md:grid-cols-2">
+      {
+        mixes.map((mix) => (
+          <li class="rounded-2xl border border-line bg-surface p-6">
+            <h2 class="text-lg font-bold">{mix.title}</h2>
+            <p class="mt-1 text-sm text-muted">
+              {mix.durationMinutes} {copy.minutes}
+            </p>
+
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {mix.genres[lang].map((genre) => (
+                <li class="rounded-full border border-line px-3 py-1 text-xs text-muted">
+                  {genre}
+                </li>
+              ))}
+            </ul>
+
+            <div class="mt-5">
+              {mix.embedUrl ? (
+                <button
+                  type="button"
+                  class="mix-play rounded-xl bg-accent px-5 py-3 font-bold text-accent-ink"
+                  data-embed={mix.embedUrl}
+                  data-title={mix.title}
+                >
+                  ▶ {mix.title}
+                </button>
+              ) : (
+                <p class="rounded-xl border border-dashed border-line px-5 py-3 text-sm text-muted">
+                  {copy.placeholderNote}
+                </p>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+</Base>
+
+<script>
+  // Facade: the third-party player is only loaded after an explicit click,
+  // so no external iframe or tracking runs on first paint.
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    '.mix-play'
+  )) {
+    button.addEventListener('click', () => {
+      const src = button.dataset.embed;
+      if (!src) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = src;
+      iframe.title = button.dataset.title ?? 'mix';
+      iframe.width = '100%';
+      iframe.height = '180';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer';
+      iframe.allow = 'autoplay; encrypted-media';
+      iframe.className = 'w-full rounded-xl border border-line';
+
+      button.replaceWith(iframe);
+    });
+  }
+</script>

@@ -1,0 +1,108 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { useTranslations } from '../../i18n/ui';
+import { getSiteContent } from '../../lib/content';
+import { localePath, type Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const { settings } = await getSiteContent();
+const yearsActive = new Date().getFullYear() - settings.foundingYear;
+
+const copy = {
+  bg: {
+    title: 'За нас — диджей дует JM Party Team',
+    description:
+      'Двама диджеи с над 450 събития зад гърба си. Работим в цяла България от 2016 г.',
+    heading: 'За нас',
+    lead: `Двама диджеи, ${yearsActive} години опит и над ${settings.eventsCompleted} събития.`,
+    body: [
+      'Започнахме да свирим заедно, защото забелязахме едно и също нещо: на повечето събития музиката се пуска, но не се води. Разликата между пълен и празен дансинг рядко е в плейлиста — тя е в четенето на публиката.',
+      'Днес работим като екип от двама. Единият е зад пулта, другият следи залата, техниката и връзката с организаторите. Това означава, че никога не оставаме без резервен вариант, ако нещо се обърка.',
+      'Инвестираме в техника, която не се чува как работи — чува се само музиката. Носим резервен контролер, микрофон и захранване на всяко събитие.',
+    ],
+    equipmentTitle: 'Техника',
+    equipment: [
+      'Активни тонколони с достатъчен запас от мощност',
+      'Безжични микрофони с резервен комплект',
+      'LED осветление и ефекти за дансинг',
+      'Контролер и лаптоп с дублиран музикален архив',
+      'Резервно захранване и кабели',
+    ],
+    citiesTitle: 'Работим в',
+    citiesNote:
+      'Пътуваме в цялата страна. За разстояния над 100 км се начислява транспортна такса.',
+  },
+  en: {
+    title: 'About us — the JM Party Team DJ duo',
+    description:
+      'Two DJs with more than 450 events behind them, working across Bulgaria since 2016.',
+    heading: 'About us',
+    lead: `Two DJs, ${yearsActive} years of experience and more than ${settings.eventsCompleted} events.`,
+    body: [
+      'We started playing together because we both noticed the same thing: at most events music gets played, but nobody leads it. The difference between a full and an empty dancefloor is rarely the playlist — it is reading the room.',
+      'Today we work as a team of two. One is behind the decks, the other watches the room, the equipment and the coordination with the organisers. It means we are never without a fallback if something goes wrong.',
+      'We invest in equipment you never notice working — you only hear the music. We bring a backup controller, microphone and power supply to every event.',
+    ],
+    equipmentTitle: 'Equipment',
+    equipment: [
+      'Active speakers with generous headroom',
+      'Wireless microphones with a backup set',
+      'LED lighting and dancefloor effects',
+      'Controller and laptop with a duplicated music library',
+      'Backup power and cabling',
+    ],
+    citiesTitle: 'We work in',
+    citiesNote:
+      'We travel nationwide. A travel fee applies for distances over 100 km.',
+  },
+}[lang];
+---
+
+<Base lang={lang} routeKey="about" title={copy.title} description={copy.description}>
+  <Section title={copy.heading} lead={copy.lead}>
+    <div class="grid gap-12 md:grid-cols-3">
+      <div class="md:col-span-2">
+        {copy.body.map((paragraph) => <p class="mb-5 text-lg text-muted">{paragraph}</p>)}
+      </div>
+
+      <aside class="grid gap-6">
+        <div class="rounded-2xl border border-line bg-surface p-6">
+          <h2 class="text-lg font-bold">{copy.equipmentTitle}</h2>
+          <ul class="mt-4 grid gap-2.5 text-sm text-muted">
+            {
+              copy.equipment.map((item) => (
+                <li class="flex gap-2">
+                  <span class="text-accent" aria-hidden="true">
+                    ✓
+                  </span>
+                  {item}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="rounded-2xl border border-line bg-surface p-6">
+          <h2 class="text-lg font-bold">{copy.citiesTitle}</h2>
+          <p class="mt-3 text-sm text-muted">
+            {settings.cities[lang].join(' · ')}
+          </p>
+          <p class="mt-3 text-sm text-muted">{copy.citiesNote}</p>
+        </div>
+
+        <a
+          href={localePath(lang, 'contact')}
+          class="rounded-xl bg-accent px-5 py-3.5 text-center font-bold text-accent-ink transition-colors hover:bg-accent-hover"
+        >
+          {t('cta.book')}
+        </a>
+      </aside>
+    </div>
+  </Section>
+</Base>

@@ -1,0 +1,69 @@
+---
+import Base from '../../layouts/Base.astro';
+import Section from '../Section.astro';
+import { getSiteContent } from '../../lib/content';
+import type { Locale } from '../../i18n/routes';
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const { faqs } = await getSiteContent();
+
+const copy = {
+  bg: {
+    title: 'Често задавани въпроси | JM Party Team',
+    description:
+      'Отговори на най-честите въпроси за резервация, цени, пътуване и техника.',
+    heading: 'Често задавани въпроси',
+    lead: 'Ако не намирате отговор, просто ни пишете.',
+  },
+  en: {
+    title: 'Frequently asked questions | JM Party Team',
+    description:
+      'Answers to the most common questions about booking, pricing, travel and equipment.',
+    heading: 'Frequently asked questions',
+    lead: 'If you cannot find an answer here, just message us.',
+  },
+}[lang];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question[lang],
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer[lang] },
+  })),
+};
+---
+
+<Base
+  lang={lang}
+  routeKey="faq"
+  title={copy.title}
+  description={copy.description}
+  jsonLd={jsonLd}
+>
+  <Section title={copy.heading} lead={copy.lead}>
+    <div class="max-w-3xl">
+      {
+        faqs.map((faq) => (
+          <details class="group border-b border-line py-5">
+            <summary class="flex cursor-pointer items-center justify-between gap-4 text-lg font-semibold marker:content-['']">
+              {faq.question[lang]}
+              <span
+                class="text-accent transition-transform group-open:rotate-45"
+                aria-hidden="true"
+              >
+                +
+              </span>
+            </summary>
+            <p class="mt-4 text-muted">{faq.answer[lang]}</p>
+          </details>
+        ))
+      }
+    </div>
+  </Section>
+</Base>

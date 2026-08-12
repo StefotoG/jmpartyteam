@@ -1,0 +1,117 @@
+---
+import '@fontsource-variable/onest';
+import '@fontsource-variable/inter';
+import '../styles/global.css';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileCtaBar from '../components/MobileCtaBar.astro';
+import { useTranslations } from '../i18n/ui';
+import { allowIndexing } from '../lib/env';
+import {
+  HTML_LANG,
+  LOCALES,
+  localePath,
+  type Locale,
+  type RouteKey,
+} from '../i18n/routes';
+
+interface Props {
+  lang: Locale;
+  title: string;
+  description: string;
+  routeKey: RouteKey;
+  /** Per-locale slug for dynamic routes, so hreflang points at the true counterpart. */
+  slugs?: Partial<Record<Locale, string>>;
+  ogImage?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  lang,
+  title,
+  description,
+  routeKey,
+  slugs,
+  ogImage = '/placeholders/hero.svg',
+  jsonLd,
+} = Astro.props;
+
+const t = useTranslations(lang);
+const canonical = new URL(localePath(lang, routeKey, slugs?.[lang]), Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
+
+const alternates = LOCALES.map((locale) => ({
+  locale,
+  hrefLang: HTML_LANG[locale],
+  href: new URL(localePath(locale, routeKey, slugs?.[locale]), Astro.site).href,
+}));
+
+const structuredData = jsonLd
+  ? Array.isArray(jsonLd)
+    ? jsonLd
+    : [jsonLd]
+  : [];
+---
+
+<!doctype html>
+<html lang={HTML_LANG[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {!allowIndexing && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical.href} />
+
+    {
+      alternates.map((alt) => (
+        <link rel="alternate" hreflang={alt.hrefLang} href={alt.href} />
+      ))
+    }
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={new URL(localePath('bg', routeKey, slugs?.bg), Astro.site).href}
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogImageUrl.href} />
+    <meta property="og:locale" content={lang === 'bg' ? 'bg_BG' : 'en_GB'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#0a0a0f" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {
+      structuredData.map((data) => (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(data)}
+        />
+      ))
+    }
+  </head>
+
+  <body class="min-h-dvh bg-ink text-text antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:font-semibold focus:text-accent-ink"
+    >
+      {t('nav.skipToContent')}
+    </a>
+
+    <Header lang={lang} routeKey={routeKey} slugs={slugs} />
+
+    <main id="main" class="pb-24 md:pb-0">
+      <slot />
+    </main>
+
+    <Footer lang={lang} />
+    <MobileCtaBar lang={lang} />
+  </body>
+</html>

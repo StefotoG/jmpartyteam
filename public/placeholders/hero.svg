@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-label="hero">
+  <defs>
+    <linearGradient id="g0" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2b1b4d"/>
+      <stop offset="55%" stop-color="#7b2d6b"/>
+      <stop offset="100%" stop-color="#c2543f"/>
+    </linearGradient>
+    <radialGradient id="g0s" cx="0.7" cy="0.25" r="0.8">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="g0n">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#g0)"/>
+  <rect width="1920" height="1080" fill="url(#g0s)"/>
+  <rect width="1920" height="1080" filter="url(#g0n)" opacity="0.12"/>
+  <rect x="0" y="594" width="1920" height="486" fill="#000000" opacity="0.35"/>
+  <text x="960" y="540" fill="#ffffff" fill-opacity="0.72"
+        font-family="system-ui, sans-serif" font-size="59"
+        font-weight="600" text-anchor="middle" letter-spacing="2">PLACEHOLDER</text>
+  <text x="960" y="621" fill="#ffffff" fill-opacity="0.5"
+        font-family="system-ui, sans-serif" font-size="39"
+        text-anchor="middle">hero</text>
+</svg>

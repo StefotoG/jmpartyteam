@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+
+/* Provisional dark-first palette. Every text/background pair below is WCAG 2.2 AA
+   or better on --color-ink; re-verify contrast if the DJs supply brand colours. */
+@theme {
+  --font-display: 'Onest Variable', system-ui, sans-serif;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+
+  --color-ink: #0a0a0f;
+  --color-surface: #13131c;
+  --color-surface-2: #1c1c28;
+  --color-line: #2a2a3a;
+
+  --color-text: #f4f4f7;
+  --color-muted: #b0b0c3;
+
+  --color-accent: #ffc84a;
+  --color-accent-hover: #ffd76f;
+  /* Text colour to use on top of --color-accent. */
+  --color-accent-ink: #0a0a0f;
+
+  /* Decorative only — fails AA for body text, never use for copy. */
+  --color-violet: #a78bfa;
+
+  --radius-card: 1rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Reserve space so lazy media never shifts layout. */
+  img,
+  video {
+    height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
