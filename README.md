@@ -4,8 +4,18 @@ Bilingual (BG/EN) promo site for the JM Party Team DJ duo.
 
 - **Astro** static output, **Tailwind v4**, no framework runtime
 - **BG at `/`**, **EN at `/en/`**, with localized URL slugs (`/uslugi/svatbi/` ↔ `/en/services/weddings/`)
-- Content from **Sanity**, falling back to local placeholder data until Sanity is configured
-- Deployed on **Netlify**; booking form via Netlify Forms
+- Content from **Sanity** (project `2vhaiuqq`), falling back to local placeholder data when unset
+- Deployed on **Netlify** from GitHub; booking form via Netlify Forms
+
+Live: https://jmpartyteam.netlify.app · CMS: https://jmpartyteam.sanity.studio
+
+## Deploying
+
+Pushing to `main` deploys automatically. Publishing content in the Studio fires a Sanity
+webhook at a Netlify build hook, which rebuilds the site — the DJs do not need a developer
+to put content live.
+
+`npm run deploy` remains available for an out-of-band deploy from your machine.
 
 ## Commands
 
@@ -19,9 +29,10 @@ Bilingual (BG/EN) promo site for the JM Party Team DJ duo.
 | `npm run seed` | Seed a Sanity dataset from the placeholder content |
 | `npm run deploy` | Build and deploy to Netlify production |
 
-Booking enquiries are captured by Netlify Forms. The DJs' calendar is deliberately **not**
-published: showing which dates are taken would expose their booking schedule to anyone,
-including competitors, so there is no availability endpoint.
+Booking enquiries are captured by Netlify Forms and emailed to jmpartyteam@gmail.com.
+The DJs' calendar is deliberately **not** published: showing which dates are taken would
+expose their booking schedule to anyone, including competitors, so there is no
+availability endpoint.
 
 ## Content
 
