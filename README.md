@@ -15,7 +15,13 @@ Pushing to `main` deploys automatically. Publishing content in the Studio fires 
 webhook at a Netlify build hook, which rebuilds the site — the DJs do not need a developer
 to put content live.
 
-`npm run deploy` remains available for an out-of-band deploy from your machine.
+`npm run deploy` remains available for an out-of-band deploy from your machine; it uploads
+directly and bypasses git entirely.
+
+Commits must be authored by a recognised Git contributor, otherwise Netlify refuses to build
+this private repo ("Unrecognized Git contributor"). The GitHub account is linked under
+Netlify → Team → Members → Git Contributors. Note that once `main` points at an unrecognised
+commit, build-hook builds fail too, so content publishing breaks as well.
 
 ## Commands
 
