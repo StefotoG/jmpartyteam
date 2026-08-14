@@ -10,7 +10,9 @@ export const sanityClient: SanityClient | null = sanityConfigured
       projectId,
       dataset,
       apiVersion: '2026-01-01',
-      useCdn: true,
+      // Must bypass the CDN: the publish webhook starts a build within a second, and the
+      // CDN can still be serving pre-publish data, which would bake stale content in.
+      useCdn: false,
       perspective: 'published',
     })
   : null;
