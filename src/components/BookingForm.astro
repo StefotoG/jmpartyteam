@@ -20,12 +20,10 @@ const labelClass = 'mb-1.5 block text-sm font-semibold';
 <form
   name="booking"
   method="POST"
-  data-netlify="true"
-  netlify-honeypot="bot-field"
+  action="/api/bookings"
   id="booking-form"
   class="grid gap-5"
 >
-  <input type="hidden" name="form-name" value="booking" />
   <input type="hidden" name="locale" value={lang} />
 
   <p hidden>
@@ -150,6 +148,8 @@ const labelClass = 'mb-1.5 block text-sm font-semibold';
       data-label-submit={t('form.submit')}
       data-label-sending={t('form.sending')}
       data-label-success={t('form.success')}
+      data-label-unavailable={t('form.unavailable')}
+      data-label-reference={t('form.reference')}
       data-label-error={t('form.error')}
       class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink transition-colors hover:bg-accent-hover disabled:opacity-60"
     >
@@ -184,19 +184,43 @@ const labelClass = 'mb-1.5 block text-sm font-semibold';
       feedback.textContent = labels.labelSending ?? '';
       submitButton.textContent = labels.labelSending ?? '';
 
+      const data = new FormData(form);
+      const value = (field: string) => {
+        const raw = data.get(field);
+        return typeof raw === 'string' && raw.trim() ? raw.trim() : undefined;
+      };
+
       try {
-        const response = await fetch('/', {
+        const response = await fetch('/api/bookings', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(
-            new FormData(form) as unknown as Record<string, string>
-          ).toString(),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: value('name'),
+            phone: value('phone'),
+            email: value('email'),
+            eventDate: value('eventDate'),
+            eventType: value('eventType'),
+            city: value('city'),
+            guests: value('guests') ? Number(value('guests')) : undefined,
+            message: value('message'),
+            botField: value('bot-field') ?? '',
+            consent: data.get('consent') === 'yes',
+            locale: value('locale'),
+          }),
         });
+
+        if (response.status === 409) {
+          feedback.className = 'text-sm font-semibold text-accent';
+          feedback.textContent = labels.labelUnavailable ?? '';
+          return;
+        }
         if (!response.ok) throw new Error(String(response.status));
+
+        const { reference } = (await response.json()) as { reference: string };
 
         form.reset();
         feedback.className = 'text-sm font-semibold text-accent';
-        feedback.textContent = labels.labelSuccess ?? '';
+        feedback.textContent = `${labels.labelSuccess ?? ''} ${labels.labelReference ?? ''} ${reference}`;
       } catch {
         feedback.className = 'text-sm font-semibold text-accent';
         feedback.textContent = labels.labelError ?? '';

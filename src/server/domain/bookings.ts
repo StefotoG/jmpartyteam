@@ -22,6 +22,36 @@ export type EnquiryResult =
   | { ok: true; reference: string }
   | { ok: false; reason: 'unavailable' };
 
+export interface BookingSummary {
+  reference: string;
+  status: string;
+  eventDate: string;
+  serviceKey: string;
+  city: string;
+  guestCount: number | null;
+  customerName: string;
+  phone: string;
+  createdAt: Date;
+}
+
+export async function listBookings(sql: Sql, limit = 200): Promise<BookingSummary[]> {
+  return sql<BookingSummary[]>`
+    SELECT
+      b.reference,
+      b.status,
+      to_char(lower(b.event_window) AT TIME ZONE 'Europe/Sofia', 'DD.MM.YYYY') AS "eventDate",
+      b.service_key AS "serviceKey",
+      b.city,
+      b.guest_count AS "guestCount",
+      c.full_name AS "customerName",
+      c.phone,
+      b.created_at AS "createdAt"
+    FROM booking b
+    JOIN customer c ON c.id = b.customer_id
+    ORDER BY lower(b.event_window)
+    LIMIT ${limit}`;
+}
+
 /**
  * Deliberately answers only about the one date asked for. Returning a list of free
  * dates would let a competitor scrape the whole calendar, which is why the public

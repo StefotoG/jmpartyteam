@@ -51,8 +51,14 @@ async function setGuard(enabled: boolean) {
 }
 
 beforeAll(async () => {
-  // Every worker holds a transaction open at the barrier, so the pool must outnumber them.
-  sql = connect(TEST_DATABASE_URL, { max: WORKERS + 4 });
+  sql = connect(TEST_DATABASE_URL, {
+    // Every worker holds a transaction open at the barrier, so the pool must outnumber them.
+    max: WORKERS + 4,
+    // Only shortens how long PostgreSQL waits before looking for a cycle. The default
+    // second per deadlock makes the naive path take seconds to resolve, which says
+    // nothing extra once the behaviour itself has been demonstrated.
+    connection: { deadlock_timeout: '50ms' },
+  });
   await migrate(sql);
 });
 

@@ -46,6 +46,9 @@ const bg = {
   'form.submit': 'Изпрати запитване',
   'form.sending': 'Изпращане…',
   'form.success': 'Благодарим! Ще се свържем с вас до 24 часа.',
+  'form.reference': 'Номер на запитването:',
+  'form.unavailable':
+    'За съжаление тази дата вече е заета. Изберете друга или ни се обадете.',
   'form.error': 'Нещо се обърка. Опитайте отново или ни се обадете.',
   'form.required': 'Задължително поле',
   'form.optional': 'по избор',
@@ -108,6 +111,9 @@ const en: Record<UIKey, string> = {
   'form.submit': 'Send enquiry',
   'form.sending': 'Sending…',
   'form.success': 'Thank you! We will get back to you within 24 hours.',
+  'form.reference': 'Enquiry reference:',
+  'form.unavailable':
+    'That date is already taken. Please pick another one or give us a call.',
   'form.error': 'Something went wrong. Please try again or call us.',
   'form.required': 'Required field',
   'form.optional': 'optional',

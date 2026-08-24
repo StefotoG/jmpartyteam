@@ -20,6 +20,8 @@ export const enquiryRequest = z.object({
   city: z.string().trim().min(1).max(120),
   guests: z.coerce.number().int().min(1).max(2000).optional(),
   message: z.string().trim().max(2000).optional(),
+  // Honeypot: a real browser leaves the hidden field empty, a naive bot fills it in.
+  botField: z.string().max(0).optional(),
   consent: z.literal(true),
   locale: z.enum(['bg', 'en']),
 });

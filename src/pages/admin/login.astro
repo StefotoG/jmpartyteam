@@ -1,0 +1,51 @@
+---
+export const prerender = false;
+
+import '../../styles/global.css';
+
+const failed = Astro.url.searchParams.has('error');
+---
+
+<!doctype html>
+<html lang="bg">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Вход · JM Party Team</title>
+  </head>
+  <body class="grid min-h-screen place-items-center bg-ink px-4 text-text">
+    <main class="w-full max-w-sm">
+      <h1 class="mb-6 text-2xl font-bold">Администрация</h1>
+
+      <form method="POST" action="/api/admin/login" class="grid gap-4">
+        <div>
+          <label class="mb-1.5 block text-sm font-semibold" for="password">Парола</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            autocomplete="current-password"
+            class="w-full rounded-xl border border-line bg-ink px-4 py-3 focus:border-accent"
+          />
+        </div>
+
+        {
+          failed && (
+            <p role="alert" class="text-sm font-semibold text-accent">
+              Грешна парола.
+            </p>
+          )
+        }
+
+        <button
+          type="submit"
+          class="rounded-xl bg-accent px-6 py-3.5 font-bold text-accent-ink hover:bg-accent-hover"
+        >
+          Вход
+        </button>
+      </form>
+    </main>
+  </body>
+</html>
