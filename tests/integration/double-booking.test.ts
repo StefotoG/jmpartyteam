@@ -5,11 +5,12 @@
  * Requires a local PostgreSQL. See README for setup.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { connect, type Sql } from '../../src/server/db/client.ts';
+import { connect, TEST_DATABASE_URL, type Sql } from '../../src/server/db/client.ts';
 import { migrate } from '../../src/server/db/migrate.ts';
 import {
   allocateGuarded,
   allocateNaive,
+  allocateSerialized,
   countOverlapping,
   type Slot,
 } from '../../src/server/domain/booking-allocation.ts';
@@ -51,7 +52,7 @@ async function setGuard(enabled: boolean) {
 
 beforeAll(async () => {
   // Every worker holds a transaction open at the barrier, so the pool must outnumber them.
-  sql = connect(process.env.TEST_DATABASE_URL, { max: WORKERS + 4 });
+  sql = connect(TEST_DATABASE_URL, { max: WORKERS + 4 });
   await migrate(sql);
 });
 
@@ -152,13 +153,31 @@ describe('resource allocation under concurrency', () => {
   it('the exclusion constraint admits exactly one of many concurrent attempts', async () => {
     await setGuard(true);
 
-    const results = await Promise.all(
+    // allSettled, not all: contenders that lose the race inside the index are aborted
+    // by the deadlock detector, so they surface as errors rather than clean refusals.
+    const results = await Promise.allSettled(
       bookingIds.map((bookingId) =>
         allocateGuarded(sql, { bookingId, resourceId, slot: CONTESTED })
       )
     );
 
+    const accepted = results.filter((r) => r.status === 'fulfilled' && r.value.ok).length;
+
+    expect(accepted).toBe(1);
+    expect(await countOverlapping(sql, resourceId, CONTESTED)).toBe(1);
+  });
+
+  it('serialising on an advisory lock refuses the losers cleanly, without errors', async () => {
+    await setGuard(true);
+
+    const results = await Promise.all(
+      bookingIds.map((bookingId) =>
+        allocateSerialized(sql, { bookingId, resourceId, slot: CONTESTED })
+      )
+    );
+
     expect(results.filter((r) => r.ok)).toHaveLength(1);
+    expect(results.filter((r) => !r.ok)).toHaveLength(WORKERS - 1);
     expect(await countOverlapping(sql, resourceId, CONTESTED)).toBe(1);
   });
 

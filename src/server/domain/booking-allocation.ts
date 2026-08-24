@@ -6,8 +6,7 @@
  * constraint arbitrate.
  */
 import type { Sql } from '../db/client.ts';
-
-const EXCLUSION_VIOLATION = '23P01';
+import { errorCode, PG_EXCLUSION_VIOLATION, withRetry } from '../db/retry.ts';
 
 export interface Slot {
   start: Date;
@@ -66,24 +65,58 @@ export async function allocateGuarded(
   input: AllocationInput
 ): Promise<AllocationResult> {
   try {
-    await sql`
-      INSERT INTO booking_resource (booking_id, resource_id, slot)
-      VALUES (
-        ${input.bookingId},
-        ${input.resourceId},
-        tstzrange(${input.slot.start}, ${input.slot.end}, '[)')
-      )`;
+    await withRetry(
+      () => sql`
+        INSERT INTO booking_resource (booking_id, resource_id, slot)
+        VALUES (
+          ${input.bookingId},
+          ${input.resourceId},
+          tstzrange(${input.slot.start}, ${input.slot.end}, '[)')
+        )`
+    );
     return { ok: true };
   } catch (error) {
-    if ((error as { code?: string }).code === EXCLUSION_VIOLATION) {
+    if (errorCode(error) === PG_EXCLUSION_VIOLATION) {
       return { ok: false, reason: 'unavailable' };
     }
     throw error;
   }
 }
 
-/** Counts allocations that overlap the slot — the invariant must never let this exceed 1. */
-export async function countOverlapping(
+/**
+ * Third strategy: queue on an advisory lock keyed by the contended resource before
+ * touching the index at all. Contenders then arrive one at a time, so the loser gets a
+ * plain constraint violation instead of waiting out PostgreSQL's deadlock detector.
+ */
+export async function allocateSerialized(
+  sql: Sql,
+  input: AllocationInput
+): Promise<AllocationResult> {
+  try {
+    return await withRetry(() =>
+      sql.begin(async (tx) => {
+        await tx`SELECT pg_advisory_xact_lock(hashtext(${input.resourceId})::bigint)`;
+
+        await tx`
+          INSERT INTO booking_resource (booking_id, resource_id, slot)
+          VALUES (
+            ${input.bookingId},
+            ${input.resourceId},
+            tstzrange(${input.slot.start}, ${input.slot.end}, '[)')
+          )`;
+
+        return { ok: true } as const;
+      })
+    );
+  } catch (error) {
+    if (errorCode(error) === PG_EXCLUSION_VIOLATION) {
+      return { ok: false, reason: 'unavailable' };
+    }
+    throw error;
+  }
+}
+
+/** Counts allocations that overlap the slot — the invariant must never let this exceed 1. */export async function countOverlapping(
   sql: Sql,
   resourceId: string,
   slot: Slot
