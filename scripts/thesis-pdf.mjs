@@ -98,6 +98,19 @@ function buildMarkdownRenderer() {
     return defaultFence(tokens, idx, options, env, self);
   };
 
+  const defaultImage = md.renderer.rules.image;
+
+  // Figures are referenced relative to the markdown file, but the HTML is rendered from a
+  // scratch directory, so the paths have to be made absolute.
+  md.renderer.rules.image = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    const src = token.attrGet('src');
+    if (src && !/^[a-z]+:/i.test(src)) {
+      token.attrSet('src', `file://${join(ROOT, 'docs', src)}`);
+    }
+    return defaultImage(tokens, idx, options, env, self);
+  };
+
   return md;
 }
 
@@ -203,6 +216,15 @@ pre.mermaid {
 }
 
 pre.mermaid svg { max-width: 100%; height: auto; }
+
+img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0.6rem 0 1.1rem;
+  break-inside: avoid;
+}
 
 .cover { break-after: page; padding-top: 2.5rem; }
 .cover .meta { margin-top: 1.6rem; font-size: 10pt; color: #4a515c; }

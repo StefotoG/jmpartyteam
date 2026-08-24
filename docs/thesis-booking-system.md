@@ -245,7 +245,8 @@ erDiagram
 
 ## 5. Core contribution — double-booking prevention
 
-Enforced declaratively in PostgreSQL:
+Correctness is enforced by the database rather than by application code, so it holds no matter
+how many processes race for the same date:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS btree_gist;
@@ -254,26 +255,89 @@ ALTER TABLE booking_resource
   ADD CONSTRAINT no_double_booking
   EXCLUDE USING gist (
     resource_id WITH =,
-    window      WITH &&
+    slot        WITH &&
   ) WHERE (active);
 ```
 
-### 5.1 Experiment 1 — concurrency control strategies
+### 5.1 The four strategies compared
 
-| Strategy | Mechanism | Measured |
-|---|---|---|
-| Naive | `SELECT` availability, then `INSERT` | Number of double-bookings (expected > 0) |
-| Optimistic | `SERIALIZABLE` isolation + bounded retry | Serialization failure rate, retry latency, throughput |
-| Declarative | GiST `EXCLUDE` constraint | Conflict rate (expected 0), p50/p95/p99 latency |
+| Strategy | Mechanism |
+|---|---|
+| `naive` | `SELECT` availability, then `INSERT` — the check-then-act pattern |
+| `constraint-noretry` | `INSERT` and let the exclusion constraint arbitrate; no retry |
+| `constraint` | The same, with bounded retry on deadlock and serialization failure |
+| `advisory` | `pg_advisory_xact_lock` on the contended key, then `INSERT` under the constraint |
 
-Driver: k6 or Artillery. *N* ∈ {1, 10, 50, 200} concurrent clients all targeting the same date.
-Deliverables: conflict-rate vs. concurrency plot, latency distribution plot, throughput table.
+The advisory strategy was not in the original design. It was added after the measurements
+showed that the constraint alone, while always correct, resolves conflicts by way of
+PostgreSQL's deadlock detector rather than by refusing the loser.
 
-### 5.2 Experiment 2 — hold TTL trade-off
+### 5.2 Experiment 1 — results
 
-A `HOLD` row reserves the slot while the client completes payment, swept by a scheduled function
-on expiry. Vary TTL ∈ {5, 10, 20, 30} minutes and measure the trade-off between conversion rate
-and inventory blocking. Classic operations-research framing, easy to present.
+Ten runs per cell; *N* concurrent workers all claiming the same slot on the same resource.
+Harness: `npm run experiment` (`scripts/experiment-concurrency.ts`), local PostgreSQL 17,
+`deadlock_timeout` at its default of one second.
+
+| Strategy | N | Admitted | Overlapping | Errored | Storm runs | p95 median | p95 worst |
+|---|---|---|---|---|---|---|---|
+| naive | 10 | 10.0 | **90** | 0 | 0/10 | 10 ms | 119 ms |
+| naive | 50 | 46.0 | **450** | 0 | 0/10 | 22 ms | 130 ms |
+| naive | 200 | 188.3 | **1873** | 0 | 0/10 | 75 ms | 127 ms |
+| constraint-noretry | 10 | 1.0 | 0 | 9 | 1/10 | 15 ms | 8.0 s |
+| constraint-noretry | 200 | 1.0 | 0 | 0 | 0/10 | 45 ms | 108 ms |
+| constraint | 10 | 1.0 | 0 | 9 | 1/10 | 17 ms | 29.1 s |
+| constraint | 50 | 1.0 | 0 | 49 | 1/10 | 20 ms | 137.7 s |
+| constraint | 200 | 1.0 | 0 | 398 | 2/10 | 50 ms | **501.4 s** |
+| advisory | 10 | 1.0 | 0 | 0 | 0/10 | 19 ms | 29 ms |
+| advisory | 50 | 1.0 | 0 | 0 | 0/10 | 34 ms | 147 ms |
+| advisory | 200 | 1.0 | 0 | 0 | 0/10 | 86 ms | **102 ms** |
+
+![Double-booking under concurrency](experiments/fig-correctness.svg)
+
+![Latency in the tail](experiments/fig-latency.svg)
+
+### 5.3 Three findings
+
+**The check-then-act pattern fails in proportion to load.** At 200 concurrent attempts the naive
+implementation admitted 188 of them on average — 1873 overlapping allocations across ten runs.
+It is not merely occasionally wrong; under contention it is almost always wrong, and it is the
+*fastest* of the four, which is exactly why it is tempting.
+
+**The exclusion constraint is correct but resolves conflicts through the deadlock detector.**
+Two transactions each insert their tuple, then each waits on the other's uncommitted row.
+PostgreSQL breaks the cycle by aborting a victim after `deadlock_timeout`. The loser therefore
+receives an error (`40P01`) rather than an answer, and pays a full second of waiting to get it.
+The behaviour is bimodal: most runs resolve in tens of milliseconds, a minority collapse.
+
+**Retrying a deadlock amplifies it.** Bounded retry raised the worst observed p95 from 8.0 s to
+501.4 s, because each attempt re-enters the same collision and pays the detector's timeout
+again. Retry is the correct response to a serialization failure and the wrong response to
+contention on a single hot key.
+
+The fix is to stop the deadlock from forming: take a transaction-scoped advisory lock on the
+contested key before touching the index. Contenders then queue, the winner commits, and the
+next attempt fails immediately with a plain constraint violation. Across every concurrency
+level this produced zero violations, zero errors, and a worst-case p95 of 102 ms.
+
+The practical conclusion is that correctness and a usable failure mode are separate properties.
+The constraint supplies the first; only the lock ordering supplies the second.
+
+### 5.4 A defect surfaced by load
+
+The experiment aborted partway through its second run with a unique-constraint violation on
+`booking.reference`. Reference generation used `lpad(counter::text, 4, '0')`, and `lpad`
+truncates rather than pads once the input exceeds the target width: booking 10000 was issued
+`JM-2026-1000`, colliding with booking 1000. The defect is invisible below 10 000 bookings and
+would have reached production. It is fixed in migration `005` and covered by a regression test.
+
+Worth stating plainly in the defence: this was found by running the system under load, not by
+the unit tests, and not by reading the code.
+
+### 5.5 Experiment 2 — hold TTL trade-off (not implemented)
+
+A `HOLD` row would reserve the slot while the client completes payment, swept by a scheduled
+function on expiry. Varying TTL ∈ {5, 10, 20, 30} minutes would measure conversion against
+inventory blocking. Deferred with the payment work; recorded here as future work.
 
 ---
 
@@ -391,8 +455,8 @@ Drizzle is preferred over Prisma: it emits plain SQL migrations (needed for the 
 
 ## 11. Evaluation chapter — what gets measured
 
-1. **Correctness** *(Tier 0 — mandatory)* — double-booking rate, naive vs. declarative, across
-   concurrency levels.
+1. **Correctness** *(Tier 0 — mandatory)* — done; see §5.2. Double-booking rate across four
+   strategies and four concurrency levels, with the latency tail that distinguishes them.
 2. **Performance** *(Tier 0 — cheap, do it)* — p50/p95/p99 API latency; Core Web Vitals before
    vs. after the static → hybrid migration.
 3. **Cost** — €/month at 1k / 10k / 100k monthly visitors; serverless vs. small VPS.
