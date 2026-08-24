@@ -12,6 +12,7 @@
     "check": "astro check",
     "placeholders": "node scripts/generate-placeholders.mjs",
     "seed": "node --env-file-if-exists=.env scripts/seed-sanity.mjs",
+    "thesis:pdf": "node scripts/thesis-pdf.mjs",
     "deploy": "netlify deploy --build --prod",
     "astro": "astro"
   },
@@ -27,6 +28,9 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "markdown-it": "^15.0.0",
+    "mermaid": "^11.17.0",
+    "puppeteer-core": "^25.8.0",
     "typescript": "^6.0.3"
   }
 }

@@ -21,6 +21,10 @@ pnpm-debug.log*
 # sanity local cache
 .sanity/
 
+# generated thesis PDF + its scratch dir
+docs/.pdf-build/
+docs/thesis-proposal.pdf
+
 # macOS-specific files
 .DS_Store
 
