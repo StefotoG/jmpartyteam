@@ -427,6 +427,37 @@ extending the type-safety discipline already present in `src/lib/types.ts`.
 - **Authorization** — roles `owner` and `assistant` (read-only), enforced in middleware.
 - **Public endpoints** — Cloudflare Turnstile replacing the honeypot, token-bucket rate limiting
   per IP and per phone number, idempotency keys on all POSTs.
+
+### 8.1 Rate limiting, and what it does not solve
+
+Counters live in PostgreSQL rather than in process memory: serverless invocations do not share
+memory, so an in-process limiter resets on every cold start and is bypassed by concurrent
+requests landing on different instances. Fixed windows, one row per bucket per window, checked
+with a single upsert.
+
+| Endpoint | Quota | Keyed on |
+|---|---|---|
+| `POST /api/availability` | 30 per minute | client IP |
+| `POST /api/bookings` | 5 per 10 minutes | client IP **and** phone number |
+
+Enquiries are keyed on the phone number as well as the address, so rotating IPs does not lift
+the limit. The address is taken from Netlify's own `x-nf-client-connection-ip` in preference to
+`x-forwarded-for`, which is caller-supplied and forgeable.
+
+Two limitations should be stated rather than glossed over.
+
+Fixed windows permit a burst across a boundary: a caller can spend a full allowance at the end
+of one window and again at the start of the next, so the effective short-term rate is twice the
+nominal one. A sliding log would fix this at the cost of a row per request.
+
+More importantly, rate limiting does not eliminate calendar enumeration, it only prices it.
+`/api/availability` is a yes/no oracle about a date, and at 30 requests per minute an attacker
+still learns roughly 43 000 dates per day — far more than the business has. The limit raises
+the cost and makes the traffic conspicuous; it does not make the schedule secret. Genuinely
+closing the hole would mean not answering availability before an enquiry is submitted, which
+trades away the feature the visitor came for. The residual risk is accepted deliberately, and
+that is the honest position to defend.
+
 - **OWASP Top 10 walkthrough** — parameterised queries, CSRF tokens on admin mutations, CSP
   tightened to nonces (drop `unsafe-inline`), SSRF-safe webhook handling, Stripe signature
   verification.
@@ -434,7 +465,7 @@ extending the type-safety discipline already present in `src/lib/types.ts`.
   endpoint, automated erasure job, DPIA summary.
 - **PCI scope** — Stripe Elements keeps card data off the server; document the reduction to SAQ-A.
 
-### 8.1 Dependency advisories require triage, not obedience
+### 8.2 Dependency advisories require triage, not obedience
 
 `npm audit` reports ten high-severity advisories, and offers to fix them with
 `npm audit fix --force`. Following that advice would downgrade `@astrojs/netlify` from 8.2.3

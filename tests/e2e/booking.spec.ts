@@ -17,6 +17,8 @@ test.beforeEach(async () => {
   await sql`
     DELETE FROM booking
     WHERE event_window && default_allocation_slot(${EVENT_DATE}::date)`;
+  // The suite sends more enquiries from one address than a real visitor ever would.
+  await sql`TRUNCATE rate_limit`;
 });
 
 test.afterAll(async () => {

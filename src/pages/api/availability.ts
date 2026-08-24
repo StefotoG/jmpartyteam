@@ -2,11 +2,21 @@ import type { APIRoute } from 'astro';
 import { db } from '../../server/db/client.ts';
 import { isDateAvailable } from '../../server/domain/bookings.ts';
 import { availabilityRequest } from '../../server/domain/validation.ts';
+import { clientIp } from '../../server/security/client-ip.ts';
+import { AVAILABILITY_QUOTA, consume } from '../../server/security/rate-limit.ts';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
-  const payload = await request.json().catch(() => null);
+export const POST: APIRoute = async (context) => {
+  const quota = await consume(db(), `availability:${clientIp(context)}`, AVAILABILITY_QUOTA);
+  if (!quota.allowed) {
+    return Response.json(
+      { error: 'rate_limited' },
+      { status: 429, headers: { 'Retry-After': String(quota.retryAfterSeconds) } }
+    );
+  }
+
+  const payload = await context.request.json().catch(() => null);
   const parsed = availabilityRequest.safeParse(payload);
 
   if (!parsed.success) {
