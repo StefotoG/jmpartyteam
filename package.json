@@ -17,6 +17,7 @@
     "experiment:charts": "node scripts/experiment-charts.ts",
     "test": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run",
     "test:watch": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs",
+    "test:e2e": "astro dev --background && playwright test",
     "thesis:pdf": "node scripts/thesis-pdf.mjs",
     "deploy": "netlify deploy --build --prod",
     "astro": "astro"
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.62.1",
     "markdown-it": "^15.0.0",
     "mermaid": "^11.17.0",
     "puppeteer-core": "^25.8.0",

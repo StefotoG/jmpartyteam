@@ -32,6 +32,7 @@ commit, build-hook builds fail too, so content publishing breaks as well.
 | `npm run preview` | Preview the build locally |
 | `npm run check` | Type-check `.astro` and `.ts` files |
 | `npm run test` | Unit and integration tests (needs local PostgreSQL) |
+| `npm run test:e2e` | Browser tests of the booking flow (starts the dev server) |
 | `npm run db:migrate` | Apply the SQL migrations |
 | `npm run experiment` | Concurrency measurements into `docs/experiments/` |
 | `npm run experiment:charts` | Render the result figures as SVG |
