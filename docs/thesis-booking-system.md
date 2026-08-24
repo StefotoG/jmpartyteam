@@ -434,20 +434,46 @@ extending the type-safety discipline already present in `src/lib/types.ts`.
   endpoint, automated erasure job, DPIA summary.
 - **PCI scope** — Stripe Elements keeps card data off the server; document the reduction to SAQ-A.
 
+### 8.1 Dependency advisories require triage, not obedience
+
+`npm audit` reports ten high-severity advisories, and offers to fix them with
+`npm audit fix --force`. Following that advice would downgrade `@astrojs/netlify` from 8.2.3
+to 6.4.1 — two major versions back — which is a regression presented as a remediation.
+
+What the advisories actually are, and why they were not acted on:
+
+| Package | Path | Reaches the deployed bundle? |
+|---|---|---|
+| `sharp`, `ipx`, `@netlify/images` | `@astrojs/netlify → @netlify/vite-plugin → @netlify/dev` | No — absent from the built output; local dev tooling only |
+| `image-size` | `@astrojs/netlify → @netlify/vite-plugin → @netlify/dev-utils` | Only as module-path strings in a build-time chunk, with no import |
+| `sharp` 0.35.3 | `astro` | Not in the vulnerable range (`<0.35.0`) |
+
+All of the advisories describe denial of service through malformed image files. The site never
+processes untrusted images: images are served as plain URLs from Sanity's CDN and there is no
+upload path anywhere in the application. The vulnerable parsers are therefore unreachable.
+
+The decision is to leave the versions in place and record the reasoning. This belongs in the
+thesis because the alternative — a clean `npm audit` obtained by downgrading a dependency two
+majors — would be worse engineering and better-looking evidence.
+
 ---
 
 ## 9. Quality engineering
 
-| Layer | Tool | Target |
-|---|---|---|
-| Unit | Vitest | `money.ts`, availability solver, state-machine guards, `Localized` flattening |
-| Property-based | fast-check | Interval overlap invariants over randomly generated ranges |
-| Integration | Vitest + Testcontainers (PostgreSQL) | Constraint behaviour, transaction isolation |
-| Contract | MSW | Stripe webhook payload handling |
-| E2E | Playwright | Full booking flow in both locales, keyboard-only path |
-| Accessibility | axe-core in Playwright | WCAG 2.2 AA regression gate |
-| Load | k6 | Concurrency experiments (§5) |
-| CI | GitHub Actions | Lint, typecheck, test, Lighthouse CI budgets |
+| Layer | Tool | Target | State |
+|---|---|---|---|
+| Unit | Vitest | Admin session signing, expiry and tampering | **done** — 5 tests |
+| Integration | Vitest + local PostgreSQL | Allocation strategies, intake, DST, reference format | **done** — 16 tests |
+| E2E | Playwright, installed Chrome | Booking flow in both locales, refusal path, validation | **done** — 5 tests |
+| CI | GitHub Actions | Migrate, test, type-check, build, E2E | **done** |
+| Load | Custom harness | Concurrency experiment (§5.2) | **done** |
+| Property-based | fast-check | Interval overlap invariants over random ranges | future work |
+| Contract | MSW | Stripe webhook payload handling | future work |
+| Accessibility | axe-core in Playwright | WCAG 2.2 AA regression gate | future work |
+
+The integration tests run against a real PostgreSQL rather than a double, because the
+behaviour under test *is* PostgreSQL's: an exclusion constraint, a GiST index, deadlock
+detection and timezone arithmetic cannot be faked without testing the fake instead.
 
 ---
 
