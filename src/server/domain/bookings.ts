@@ -5,7 +5,11 @@
  */
 import type { Sql } from '../db/client.ts';
 import { errorCode, PG_EXCLUSION_VIOLATION, withRetry } from '../db/retry.ts';
+import { enqueue } from '../notifications/outbox.ts';
 import { DEFAULT_HOLD_TTL_SECONDS } from './holds.ts';
+
+/** Where new enquiries are announced. Belongs in configuration once there is any. */
+const BUSINESS_INBOX = 'jmpartyteam@gmail.com';
 
 export interface EnquiryInput {
   fullName: string;
@@ -151,6 +155,31 @@ export async function createEnquiry(
             'held',
             now() + make_interval(secs => ${holdTtlSeconds})
           )`;
+
+        // Enqueued here, not after committing: the notification must exist exactly when
+        // the booking does, and neither without the other.
+        await enqueue(tx, {
+          kind: 'enquiry_alert',
+          recipient: BUSINESS_INBOX,
+          locale: 'bg',
+          payload: {
+            reference: booking.reference,
+            eventDate: input.eventDate,
+            serviceKey: input.serviceKey,
+            city: input.city,
+            customerName: input.fullName,
+            phone: input.phone,
+          },
+        });
+
+        if (input.email) {
+          await enqueue(tx, {
+            kind: 'enquiry_received',
+            recipient: input.email,
+            locale: input.locale,
+            payload: { reference: booking.reference, eventDate: input.eventDate },
+          });
+        }
 
         return { ok: true, reference: booking.reference } as const;
       })

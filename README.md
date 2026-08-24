@@ -34,6 +34,7 @@ commit, build-hook builds fail too, so content publishing breaks as well.
 | `npm run test` | Unit and integration tests (needs local PostgreSQL) |
 | `npm run test:e2e` | Browser tests of the booking flow (starts the dev server) |
 | `npm run db:migrate` | Apply the SQL migrations |
+| `npm run notifications` | Deliver one batch from the outbox |
 | `npm run experiment` | Concurrency measurements into `docs/experiments/` |
 | `npm run experiment:charts` | Render the result figures as SVG |
 | `npm run thesis:pdf` | Render the diploma project plan to PDF |

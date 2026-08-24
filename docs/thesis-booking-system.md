@@ -435,6 +435,47 @@ stateDiagram-v2
 Transitions are table-driven (a single guard map), not scattered conditionals — one place to
 test, and it yields a clean UML figure for the thesis.
 
+### 6.1 Notifications, and the dual-write problem
+
+Committing a booking and sending an email are two systems with no transaction spanning them,
+so doing both naively means choosing which way to be wrong. Send first and a booking that
+subsequently rolls back has already told the client it succeeded. Commit first and a crash in
+between loses the notification with no trace that it was ever owed.
+
+The outbox removes the choice. The message is written to `outbox_message` in the same
+transaction as the booking, so it exists exactly when the booking does and neither can exist
+without the other. A separate dispatcher delivers it afterwards. The cost is that delivery
+becomes at-least-once rather than exactly-once: a crash between sending and marking the row
+sent produces a duplicate. For an enquiry acknowledgement that is an acceptable trade; for a
+payment receipt it would need an idempotency key at the provider.
+
+Claiming work turns out to be the same contention problem as booking allocation. The obvious
+`SELECT ... FOR UPDATE SKIP LOCKED` is not sufficient on its own: in autocommit the lock is
+released when the statement finishes, so a second dispatcher reads the same rows a moment
+later and delivers them again. The claim has to be a single statement that both selects and
+marks:
+
+```sql
+UPDATE outbox_message
+SET next_attempt_at = now() + make_interval(secs => 60)
+WHERE id IN (
+  SELECT id FROM outbox_message
+  WHERE state = 'pending' AND next_attempt_at <= now()
+  ORDER BY created_at LIMIT $1
+  FOR UPDATE SKIP LOCKED
+)
+RETURNING id, kind, recipient, locale, payload
+```
+
+Pushing `next_attempt_at` forward leases the message rather than adding a `sending` state.
+Nobody else sees it while the lease holds, and a dispatcher that dies releases its work
+automatically when the lease lapses — where an explicit `sending` state would have stranded
+the row until someone wrote a reaper for it.
+
+Failures back off exponentially and are abandoned after five attempts, with the provider's
+error kept on the row so a human can see why. A test asserts that three dispatchers running
+concurrently over twelve messages deliver each exactly once.
+
 ---
 
 ## 7. API surface
@@ -534,7 +575,7 @@ majors — would be worse engineering and better-looking evidence.
 | Layer | Tool | Target | State |
 |---|---|---|---|
 | Unit | Vitest | Admin session signing, expiry and tampering | **done** — 5 tests |
-| Integration | Vitest + local PostgreSQL | Allocation, holds, rate limiting, DST, references | **done** — 32 tests |
+| Integration | Vitest + local PostgreSQL | Allocation, holds, outbox, rate limiting, DST | **done** — 42 tests |
 | E2E | Playwright, installed Chrome | Booking flow in both locales, refusal path, validation | **done** — 5 tests |
 | CI | GitHub Actions | Migrate, test, type-check, build, E2E | **done** |
 | Load | Custom harness | Concurrency and hold-deadline experiments (§5.2, §5.5) | **done** |
