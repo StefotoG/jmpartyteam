@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect width="760" height="420" fill="#ffffff"/>
+  <text x="72" y="26" font-size="15" font-weight="700" fill="#14161a">Double-booking under concurrency</text>
+  <text x="72" y="44" font-size="11.5" fill="#5a626e">Overlapping allocations admitted for one resource, totalled over 10 runs per cell. Correct is zero.</text>
+  <g transform="translate(72,56)">
+    <line x1="0" y1="308.0" x2="498" y2="308.0" stroke="#e2e6ec"/>
+    <text x="-10" y="312.0" font-size="10.5" fill="#5a626e" text-anchor="end">0</text>
+    <line x1="0" y1="231.0" x2="498" y2="231.0" stroke="#e2e6ec"/>
+    <text x="-10" y="235.0" font-size="10.5" fill="#5a626e" text-anchor="end">468</text>
+    <line x1="0" y1="154.0" x2="498" y2="154.0" stroke="#e2e6ec"/>
+    <text x="-10" y="158.0" font-size="10.5" fill="#5a626e" text-anchor="end">937</text>
+    <line x1="0" y1="77.0" x2="498" y2="77.0" stroke="#e2e6ec"/>
+    <text x="-10" y="81.0" font-size="10.5" fill="#5a626e" text-anchor="end">1405</text>
+    <line x1="0" y1="0.0" x2="498" y2="0.0" stroke="#e2e6ec"/>
+    <text x="-10" y="4.0" font-size="10.5" fill="#5a626e" text-anchor="end">1873</text>
+    <rect x="10.3" y="308.0" width="24.0" height="0.0" fill="#c0392b"/>
+    <rect x="36.3" y="308.0" width="24.0" height="0.0" fill="#e08e0b"/>
+    <rect x="62.3" y="308.0" width="24.0" height="0.0" fill="#2e6da4"/>
+    <rect x="88.3" y="308.0" width="24.0" height="0.0" fill="#1f8a5f"/>
+    <text x="62.3" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">n = 1</text>
+    <rect x="134.8" y="293.2" width="24.0" height="14.8" fill="#c0392b"/>
+    <text x="146.8" y="288.2" font-size="10" fill="#14161a" text-anchor="middle">90</text>
+    <rect x="160.8" y="308.0" width="24.0" height="0.0" fill="#e08e0b"/>
+    <rect x="186.8" y="308.0" width="24.0" height="0.0" fill="#2e6da4"/>
+    <rect x="212.8" y="308.0" width="24.0" height="0.0" fill="#1f8a5f"/>
+    <text x="186.8" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">n = 10</text>
+    <rect x="259.3" y="234.0" width="24.0" height="74.0" fill="#c0392b"/>
+    <text x="271.3" y="229.0" font-size="10" fill="#14161a" text-anchor="middle">450</text>
+    <rect x="285.3" y="308.0" width="24.0" height="0.0" fill="#e08e0b"/>
+    <rect x="311.3" y="308.0" width="24.0" height="0.0" fill="#2e6da4"/>
+    <rect x="337.3" y="308.0" width="24.0" height="0.0" fill="#1f8a5f"/>
+    <text x="311.3" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">n = 50</text>
+    <rect x="383.8" y="0.0" width="24.0" height="308.0" fill="#c0392b"/>
+    <text x="395.8" y="-5.0" font-size="10" fill="#14161a" text-anchor="middle">1873</text>
+    <rect x="409.8" y="308.0" width="24.0" height="0.0" fill="#e08e0b"/>
+    <rect x="435.8" y="308.0" width="24.0" height="0.0" fill="#2e6da4"/>
+    <rect x="461.8" y="308.0" width="24.0" height="0.0" fill="#1f8a5f"/>
+    <text x="435.8" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">n = 200</text>
+    <line x1="0" y1="308" x2="498" y2="308" stroke="#8b93a1"/>
+    <text transform="translate(-52,154) rotate(-90)" font-size="11" fill="#5a626e" text-anchor="middle">overlapping allocations</text>
+    <text x="249" y="350" font-size="11" fill="#5a626e" text-anchor="middle">concurrent attempts on one contested slot</text>
+  </g>
+  <rect x="594" y="55" width="11" height="11" rx="2" fill="#c0392b"/>
+  <text x="612" y="64" font-size="11.5" fill="#14161a">naive</text>
+  <rect x="594" y="77" width="11" height="11" rx="2" fill="#e08e0b"/>
+  <text x="612" y="86" font-size="11.5" fill="#14161a">constraint-noretry</text>
+  <rect x="594" y="99" width="11" height="11" rx="2" fill="#2e6da4"/>
+  <text x="612" y="108" font-size="11.5" fill="#14161a">constraint</text>
+  <rect x="594" y="121" width="11" height="11" rx="2" fill="#1f8a5f"/>
+  <text x="612" y="130" font-size="11.5" fill="#14161a">advisory</text>
+</svg>

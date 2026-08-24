@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect width="760" height="420" fill="#ffffff"/>
+  <text x="72" y="26" font-size="15" font-weight="700" fill="#14161a">Correctness is cheap on average and expensive in the tail</text>
+  <text x="72" y="44" font-size="11.5" fill="#5a626e">p95 latency over 10 runs per cell: solid is the worst run, dashed the median. Logarithmic axis.</text>
+  <g transform="translate(72,56)">
+    <line x1="0" y1="308.0" x2="498" y2="308.0" stroke="#e2e6ec"/>
+    <text x="-10" y="312.0" font-size="10.5" fill="#5a626e" text-anchor="end">1 ms</text>
+    <line x1="0" y1="256.7" x2="498" y2="256.7" stroke="#e2e6ec"/>
+    <text x="-10" y="260.7" font-size="10.5" fill="#5a626e" text-anchor="end">10 ms</text>
+    <line x1="0" y1="205.3" x2="498" y2="205.3" stroke="#e2e6ec"/>
+    <text x="-10" y="209.3" font-size="10.5" fill="#5a626e" text-anchor="end">100 ms</text>
+    <line x1="0" y1="154.0" x2="498" y2="154.0" stroke="#e2e6ec"/>
+    <text x="-10" y="158.0" font-size="10.5" fill="#5a626e" text-anchor="end">1 s</text>
+    <line x1="0" y1="102.7" x2="498" y2="102.7" stroke="#e2e6ec"/>
+    <text x="-10" y="106.7" font-size="10.5" fill="#5a626e" text-anchor="end">10 s</text>
+    <line x1="0" y1="51.3" x2="498" y2="51.3" stroke="#e2e6ec"/>
+    <text x="-10" y="55.3" font-size="10.5" fill="#5a626e" text-anchor="end">100 s</text>
+    <line x1="0" y1="0.0" x2="498" y2="0.0" stroke="#e2e6ec"/>
+    <text x="-10" y="4.0" font-size="10.5" fill="#5a626e" text-anchor="end">1000 s</text>
+    <polyline points="62.3,241.7 186.8,255.6 311.3,238.4 435.8,211.7" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>
+    <polyline points="62.3,250.2 186.8,247.3 311.3,240.2 435.8,222.8" fill="none" stroke="#e08e0b" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>
+    <polyline points="62.3,253.1 186.8,244.7 311.3,237.5 435.8,218.0" fill="none" stroke="#2e6da4" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>
+    <polyline points="62.3,253.1 186.8,242.2 311.3,228.8 435.8,208.5" fill="none" stroke="#1f8a5f" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>
+    <polyline points="62.3,202.7 186.8,201.6 311.3,199.4 435.8,200.0" fill="none" stroke="#c0392b" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="62.3" cy="202.7" r="3.5" fill="#c0392b"/>
+    <circle cx="186.8" cy="201.6" r="3.5" fill="#c0392b"/>
+    <circle cx="311.3" cy="199.4" r="3.5" fill="#c0392b"/>
+    <circle cx="435.8" cy="200.0" r="3.5" fill="#c0392b"/>
+    <polyline points="62.3,193.6 186.8,107.5 311.3,233.7 435.8,203.5" fill="none" stroke="#e08e0b" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="62.3" cy="193.6" r="3.5" fill="#e08e0b"/>
+    <circle cx="186.8" cy="107.5" r="3.5" fill="#e08e0b"/>
+    <circle cx="311.3" cy="233.7" r="3.5" fill="#e08e0b"/>
+    <circle cx="435.8" cy="203.5" r="3.5" fill="#e08e0b"/>
+    <polyline points="62.3,200.4 186.8,78.9 311.3,44.2 435.8,15.4" fill="none" stroke="#2e6da4" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="62.3" cy="200.4" r="3.5" fill="#2e6da4"/>
+    <circle cx="186.8" cy="78.9" r="3.5" fill="#2e6da4"/>
+    <circle cx="311.3" cy="44.2" r="3.5" fill="#2e6da4"/>
+    <circle cx="435.8" cy="15.4" r="3.5" fill="#2e6da4"/>
+    <polyline points="62.3,205.0 186.8,232.8 311.3,196.8 435.8,204.9" fill="none" stroke="#1f8a5f" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="62.3" cy="205.0" r="3.5" fill="#1f8a5f"/>
+    <circle cx="186.8" cy="232.8" r="3.5" fill="#1f8a5f"/>
+    <circle cx="311.3" cy="196.8" r="3.5" fill="#1f8a5f"/>
+    <circle cx="435.8" cy="204.9" r="3.5" fill="#1f8a5f"/>
+    <text x="62.3" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">n = 1</text>
+    <text x="186.8" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">n = 10</text>
+    <text x="311.3" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">n = 50</text>
+    <text x="435.8" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">n = 200</text>
+    <line x1="0" y1="308" x2="498" y2="308" stroke="#8b93a1"/>
+    <text transform="translate(-52,154) rotate(-90)" font-size="11" fill="#5a626e" text-anchor="middle">p95 latency, log scale</text>
+    <text x="249" y="350" font-size="11" fill="#5a626e" text-anchor="middle">concurrent attempts on one contested slot</text>
+  </g>
+  <rect x="594" y="55" width="11" height="11" rx="2" fill="#c0392b"/>
+  <text x="612" y="64" font-size="11.5" fill="#14161a">naive</text>
+  <rect x="594" y="77" width="11" height="11" rx="2" fill="#e08e0b"/>
+  <text x="612" y="86" font-size="11.5" fill="#14161a">constraint-noretry</text>
+  <rect x="594" y="99" width="11" height="11" rx="2" fill="#2e6da4"/>
+  <text x="612" y="108" font-size="11.5" fill="#14161a">constraint</text>
+  <rect x="594" y="121" width="11" height="11" rx="2" fill="#1f8a5f"/>
+  <text x="612" y="130" font-size="11.5" fill="#14161a">advisory</text>
+</svg>

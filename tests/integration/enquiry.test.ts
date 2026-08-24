@@ -45,6 +45,8 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await sql`TRUNCATE booking_resource, booking, customer, resource RESTART IDENTITY CASCADE`;
+  // Not owned by a column, so TRUNCATE ... RESTART IDENTITY does not touch it.
+  await sql`ALTER SEQUENCE booking_reference_seq RESTART`;
 });
 
 describe('enquiry intake', () => {
@@ -63,7 +65,7 @@ describe('enquiry intake', () => {
     const result = await createEnquiry(sql, enquiry());
 
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.reference).toMatch(/^JM-\d{4}-\d{4}$/);
+    if (result.ok) expect(result.reference).toMatch(/^JM-\d{4}-\d{4,}$/);
     expect(await isDateAvailable(sql, SUMMER_DATE)).toBe(false);
   });
 
@@ -90,6 +92,21 @@ describe('enquiry intake', () => {
     await createEnquiry(sql, enquiry());
 
     expect(await isDateAvailable(sql, '2026-06-21')).toBe(true);
+  });
+
+  it('keeps references unique past the four-digit padding boundary', async () => {
+    await addDjs(1);
+    await sql`SELECT setval('booking_reference_seq', 9999)`;
+
+    const references = await sql<{ reference: string }[]>`
+      SELECT next_booking_reference() AS reference FROM generate_series(1, 3)`;
+
+    expect(references.map((r) => r.reference.split('-')[2])).toEqual([
+      '10000',
+      '10001',
+      '10002',
+    ]);
+    expect(new Set(references.map((r) => r.reference)).size).toBe(3);
   });
 
   it('starts every event at 18:00 local time on both sides of the DST change', async () => {

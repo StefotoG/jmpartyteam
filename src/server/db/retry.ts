@@ -21,7 +21,6 @@ export async function withRetry<T>(operation: () => Promise<T>, attempts = 3): P
       return await operation();
     } catch (error) {
       if (attempt >= attempts || !RETRYABLE.has(errorCode(error) ?? '')) throw error;
-
       // Jittered backoff, so retries of the same collision do not line up again.
       const backoffMs = 2 ** attempt * 5 * (0.5 + Math.random());
       await new Promise((resolve) => setTimeout(resolve, backoffMs));

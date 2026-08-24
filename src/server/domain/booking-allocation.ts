@@ -62,7 +62,8 @@ export async function allocateNaive(
 
 export async function allocateGuarded(
   sql: Sql,
-  input: AllocationInput
+  input: AllocationInput,
+  options: { attempts?: number } = {}
 ): Promise<AllocationResult> {
   try {
     await withRetry(
@@ -72,7 +73,8 @@ export async function allocateGuarded(
           ${input.bookingId},
           ${input.resourceId},
           tstzrange(${input.slot.start}, ${input.slot.end}, '[)')
-        )`
+        )`,
+      options.attempts
     );
     return { ok: true };
   } catch (error) {
@@ -90,23 +92,26 @@ export async function allocateGuarded(
  */
 export async function allocateSerialized(
   sql: Sql,
-  input: AllocationInput
+  input: AllocationInput,
+  options: { attempts?: number } = {}
 ): Promise<AllocationResult> {
   try {
-    return await withRetry(() =>
-      sql.begin(async (tx) => {
-        await tx`SELECT pg_advisory_xact_lock(hashtext(${input.resourceId})::bigint)`;
+    return await withRetry(
+      () =>
+        sql.begin(async (tx) => {
+          await tx`SELECT pg_advisory_xact_lock(hashtext(${input.resourceId})::bigint)`;
 
-        await tx`
-          INSERT INTO booking_resource (booking_id, resource_id, slot)
-          VALUES (
-            ${input.bookingId},
-            ${input.resourceId},
-            tstzrange(${input.slot.start}, ${input.slot.end}, '[)')
-          )`;
+          await tx`
+            INSERT INTO booking_resource (booking_id, resource_id, slot)
+            VALUES (
+              ${input.bookingId},
+              ${input.resourceId},
+              tstzrange(${input.slot.start}, ${input.slot.end}, '[)')
+            )`;
 
-        return { ok: true } as const;
-      })
+          return { ok: true } as const;
+        }),
+      options.attempts
     );
   } catch (error) {
     if (errorCode(error) === PG_EXCLUSION_VIOLATION) {
