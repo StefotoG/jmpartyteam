@@ -5,12 +5,15 @@
  */
 export type NotificationKind = 'enquiry_received' | 'enquiry_alert';
 
+/** Flat and JSON-safe, so the driver can serialise it without a cast. */
+export type Payload = Record<string, string | number | boolean | null>;
+
 export interface Notification {
   id: string;
   kind: NotificationKind;
   recipient: string;
   locale: 'bg' | 'en';
-  payload: Record<string, unknown>;
+  payload: Payload;
 }
 
 export interface Transport {

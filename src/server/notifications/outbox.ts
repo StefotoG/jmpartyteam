@@ -5,8 +5,8 @@
  * once without two of them delivering the same message — the same contention problem as the
  * booking allocation, solved by letting the database hand out disjoint work.
  */
-import type { Sql } from '../db/client.ts';
-import type { Notification, NotificationKind, Transport } from './transport.ts';
+import type { Queryable, Sql } from '../db/client.ts';
+import type { Notification, NotificationKind, Payload, Transport } from './transport.ts';
 
 export const DEFAULT_MAX_ATTEMPTS = 5;
 const BASE_BACKOFF_SECONDS = 30;
@@ -16,7 +16,7 @@ export interface OutboxMessage {
   kind: NotificationKind;
   recipient: string;
   locale: 'bg' | 'en';
-  payload: Record<string, unknown>;
+  payload: Payload;
 }
 
 export interface DispatchSummary {
@@ -26,7 +26,7 @@ export interface DispatchSummary {
 }
 
 /** Must be called with the transaction that also writes the thing being notified about. */
-export async function enqueue(sql: Sql, message: OutboxMessage): Promise<void> {
+export async function enqueue(sql: Queryable, message: OutboxMessage): Promise<void> {
   await sql`
     INSERT INTO outbox_message (kind, recipient, locale, payload)
     VALUES (
