@@ -1,0 +1,8 @@
+# System Usability Scale responses.
+#
+# One row per participant. q1..q10 are answers on the 1-5 agreement scale, in the order
+# the questions appear in the thesis plan (odd items positively worded, even items
+# negatively worded). Do not reorder the columns: the scoring depends on the alternation.
+#
+# Score with: npm run sus
+participant,date,locale,q1,q2,q3,q4,q5,q6,q7,q8,q9,q10

@@ -534,10 +534,10 @@ majors — would be worse engineering and better-looking evidence.
 | Layer | Tool | Target | State |
 |---|---|---|---|
 | Unit | Vitest | Admin session signing, expiry and tampering | **done** — 5 tests |
-| Integration | Vitest + local PostgreSQL | Allocation strategies, intake, DST, reference format | **done** — 16 tests |
+| Integration | Vitest + local PostgreSQL | Allocation, holds, rate limiting, DST, references | **done** — 32 tests |
 | E2E | Playwright, installed Chrome | Booking flow in both locales, refusal path, validation | **done** — 5 tests |
 | CI | GitHub Actions | Migrate, test, type-check, build, E2E | **done** |
-| Load | Custom harness | Concurrency experiment (§5.2) | **done** |
+| Load | Custom harness | Concurrency and hold-deadline experiments (§5.2, §5.5) | **done** |
 | Property-based | fast-check | Interval overlap invariants over random ranges | future work |
 | Contract | MSW | Stripe webhook payload handling | future work |
 | Accessibility | axe-core in Playwright | WCAG 2.2 AA regression gate | future work |
@@ -595,6 +595,62 @@ Drizzle is preferred over Prisma: it emits plain SQL migrations (needed for the 
 
 Items 1 and 2 come almost free from the k6 run and a pair of Lighthouse reports. Items 3–5
 require additional scope and belong to Tier B or later.
+
+### 11.1 Usability study protocol
+
+The instrument and the analysis exist; the responses do not, because they have to come from
+real participants. `docs/experiments/sus-responses.csv` holds the header and nothing else
+until the sessions are run, and `npm run sus` scores whatever is in it. The arithmetic is
+verified independently with `npm run sus -- --self-test`, which checks the three responses
+whose scores are fixed by definition: all-positive is 100, all-negative is 0, all-neutral is 50.
+
+**Participants.** Ten to twelve, none of whom have seen the site. Recruit for the actual
+audience — people who have organised a wedding, prom or corporate party — rather than fellow
+students, and split them across Bulgarian and English.
+
+**Setup.** Their own phone where possible, since that is how the site is used. Point the
+device at a staging deployment seeded with a realistic calendar, so some dates are genuinely
+taken. Record nothing but the metrics below; take no video and no personal data.
+
+**Tasks.** Read aloud, one at a time, with no coaching:
+
+1. Find out what a wedding costs.
+2. Check whether the DJs are free on a specific Saturday you care about.
+3. Find a date they are *not* free on, and say how you know.
+4. Send an enquiry for a date that is free.
+5. Say what happens next, in your own words.
+
+Task 3 is the one that matters. It tests whether the refusal is understood as "that night is
+taken" rather than as a broken form — the failure mode the API was designed to avoid, and the
+one no automated test can judge.
+
+**Measures per task.** Completed without help (yes/no), time in seconds, number of wrong turns,
+and anything said aloud that indicates confusion.
+
+**Questionnaire.** The standard ten SUS items, answered 1 (strongly disagree) to 5 (strongly
+agree). Odd items are positively worded and even items negatively worded; the alternation is
+what the scoring depends on, so the order must not be changed.
+
+| # | English | Bulgarian |
+|---|---|---|
+| 1 | I think that I would like to use this site frequently | Мисля, че бих използвал/а този сайт често |
+| 2 | I found the site unnecessarily complex | Намирам сайта за ненужно сложен |
+| 3 | I thought the site was easy to use | Мисля, че сайтът е лесен за използване |
+| 4 | I think that I would need the support of a technical person to be able to use this site | Мисля, че бих се нуждаел/а от помощ от технически човек, за да използвам сайта |
+| 5 | I found the various functions in this site were well integrated | Намирам, че функциите на сайта са добре свързани помежду си |
+| 6 | I thought there was too much inconsistency in this site | Мисля, че в сайта има твърде много несъответствия |
+| 7 | I would imagine that most people would learn to use this site very quickly | Предполагам, че повечето хора биха се научили да използват сайта много бързо |
+| 8 | I found the site very cumbersome to use | Намирам сайта за много тромав за използване |
+| 9 | I felt very confident using the site | Чувствах се уверен/а, докато използвах сайта |
+| 10 | I needed to learn a lot of things before I could get going with this site | Трябваше да науча много неща, преди да мога да работя със сайта |
+
+**Reporting.** Mean SUS with its standard deviation and a 95 % interval, against Sauro's
+benchmark mean of 68 and the Bangor adjective scale. With ten participants the interval is
+wide; report it as indicative and let the task observations carry the qualitative weight.
+
+**Ethics.** Participation is voluntary and unpaid, no personal data is recorded, enquiries are
+submitted against a staging database, and participants are told they are testing the site
+rather than being tested themselves.
 
 ---
 
