@@ -223,7 +223,12 @@ interface HoldRun {
   confirmTooLate: number;
 }
 
-function holdsChart(runs: HoldRun[], ttls: number[], replyMs: number): string {
+function holdsChart(
+  runs: HoldRun[],
+  ttls: number[],
+  replyMs: number,
+  arrivals: number
+): string {
   const series: Record<string, number[]> = { accepted: [], confirmed: [], 'turned away late': [] };
 
   for (const ttl of ttls) {
@@ -278,7 +283,7 @@ function holdsChart(runs: HoldRun[], ttls: number[], replyMs: number): string {
 
   parts.push(
     `    <line x1="0" y1="${PLOT_H}" x2="${PLOT_W}" y2="${PLOT_H}" stroke="#8b93a1"/>`,
-    `    <text transform="translate(-52,${PLOT_H / 2}) rotate(-90)" font-size="11" fill="#5a626e" text-anchor="middle">enquiries out of ${runs[0] ? '60' : '60'}</text>`,
+    `    <text transform="translate(-52,${PLOT_H / 2}) rotate(-90)" font-size="11" fill="#5a626e" text-anchor="middle">enquiries out of ${arrivals}</text>`,
     `    <text x="${PLOT_W / 2}" y="${PLOT_H + 42}" font-size="11" fill="#5a626e" text-anchor="middle">hold deadline ÷ longest client reply time</text>`
   );
 
@@ -329,7 +334,7 @@ async function main() {
   }
 
   const holds = JSON.parse(holdsRaw) as {
-    parameters: { MAX_CONFIRM_DELAY_MS: number; REPETITIONS: number };
+    parameters: { MAX_CONFIRM_DELAY_MS: number; REPETITIONS: number; ARRIVALS: number };
     results: HoldRun[];
   };
   const ttls = [...new Set(holds.results.map((r) => r.ttlMs))].sort((a, b) => a - b);
@@ -339,7 +344,12 @@ async function main() {
     frame(
       'How long to hold a date before letting it go',
       `Mean over ${holds.parameters.REPETITIONS} runs. Too short and accepted clients are turned away; too long and non-repliers squat on dates.`,
-      holdsChart(holds.results, ttls, holds.parameters.MAX_CONFIRM_DELAY_MS),
+      holdsChart(
+        holds.results,
+        ttls,
+        holds.parameters.MAX_CONFIRM_DELAY_MS,
+        holds.parameters.ARRIVALS
+      ),
       legendBlock(['accepted', 'confirmed', 'turned away late'])
     ),
     'utf8'
