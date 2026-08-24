@@ -1,4 +1,11 @@
-@import 'tailwindcss';
+/* Scanning is scoped to src/: left automatic, Tailwind also reads docs/ and scripts/ and
+   turns ordinary English words in the prose into utility classes. Server code and the
+   admin area are excluded for the same reason — neither contains markup, and internal
+   tooling must not enlarge what public pages download. */
+@import 'tailwindcss' source('../../src');
+@source not '../server';
+@source not '../pages/admin';
+@source not '../styles/admin.css';
 
 /* Provisional dark-first palette. Every text/background pair below is WCAG 2.2 AA
    or better on --color-ink; re-verify contrast if the DJs supply brand colours. */

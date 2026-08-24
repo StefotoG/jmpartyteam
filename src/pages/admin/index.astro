@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import '../../styles/global.css';
+import '../../styles/admin.css';
 import { db } from '../../server/db/client';
 import { isValidSession, SESSION_COOKIE } from '../../server/auth/session';
 import { listBookings } from '../../server/domain/bookings';
@@ -30,48 +30,44 @@ const STATUS_LABELS: Record<string, string> = {
     <meta name="robots" content="noindex, nofollow" />
     <title>Запитвания · JM Party Team</title>
   </head>
-  <body class="min-h-screen bg-ink px-4 py-10 text-text">
-    <main class="mx-auto max-w-6xl">
-      <header class="mb-8 flex flex-wrap items-baseline justify-between gap-3">
-        <h1 class="text-2xl font-bold">Запитвания</h1>
-        <p class="text-sm text-muted">{bookings.length} записа</p>
-      </header>
+  <body>
+    <main>
+      <div class="masthead">
+        <h1>Запитвания</h1>
+        <p class="count">{bookings.length} записа</p>
+      </div>
 
       {
         bookings.length === 0 ? (
-          <p class="text-muted">Все още няма запитвания.</p>
+          <p class="empty">Все още няма запитвания.</p>
         ) : (
-          <div class="overflow-x-auto rounded-xl border border-line">
-            <table class="w-full border-collapse text-sm">
+          <div class="table-wrap">
+            <table>
               <thead>
-                <tr class="bg-surface text-left">
-                  <th class="px-4 py-3 font-semibold">Дата</th>
-                  <th class="px-4 py-3 font-semibold">Номер</th>
-                  <th class="px-4 py-3 font-semibold">Клиент</th>
-                  <th class="px-4 py-3 font-semibold">Телефон</th>
-                  <th class="px-4 py-3 font-semibold">Услуга</th>
-                  <th class="px-4 py-3 font-semibold">Град</th>
-                  <th class="px-4 py-3 font-semibold">Гости</th>
-                  <th class="px-4 py-3 font-semibold">Статус</th>
+                <tr>
+                  <th>Дата</th>
+                  <th>Номер</th>
+                  <th>Клиент</th>
+                  <th>Телефон</th>
+                  <th>Услуга</th>
+                  <th>Град</th>
+                  <th>Гости</th>
+                  <th>Статус</th>
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((booking) => (
-                  <tr class="border-t border-line">
-                    <td class="px-4 py-3 font-semibold">{booking.eventDate}</td>
-                    <td class="px-4 py-3 text-muted">{booking.reference}</td>
-                    <td class="px-4 py-3">{booking.customerName}</td>
-                    <td class="px-4 py-3">
-                      <a href={`tel:${booking.phone}`} class="hover:text-accent">
-                        {booking.phone}
-                      </a>
+                  <tr>
+                    <td class="date">{booking.eventDate}</td>
+                    <td class="reference">{booking.reference}</td>
+                    <td>{booking.customerName}</td>
+                    <td>
+                      <a href={`tel:${booking.phone}`}>{booking.phone}</a>
                     </td>
-                    <td class="px-4 py-3">{booking.serviceKey}</td>
-                    <td class="px-4 py-3">{booking.city}</td>
-                    <td class="px-4 py-3">{booking.guestCount ?? '—'}</td>
-                    <td class="px-4 py-3">
-                      {STATUS_LABELS[booking.status] ?? booking.status}
-                    </td>
+                    <td>{booking.serviceKey}</td>
+                    <td>{booking.city}</td>
+                    <td>{booking.guestCount ?? '—'}</td>
+                    <td>{STATUS_LABELS[booking.status] ?? booking.status}</td>
                   </tr>
                 ))}
               </tbody>

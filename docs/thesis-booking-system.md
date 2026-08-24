@@ -110,20 +110,50 @@ argument of the thesis and should be defended explicitly (ADR-001).
 
 ### 3.3 Rendering topology
 
-`astro.config.mjs` moves from `output: 'static'` to `output: 'server'` with the Netlify adapter.
-Every existing marketing page keeps `export const prerender = true`; only `/api/**` and
-`/admin/**` render on demand. The performance profile of the public site must be shown to be
-unchanged — measured, not asserted.
+Astro 5 removed the separate `hybrid` mode: with an adapter configured, `output: 'static'`
+stays the default and individual routes opt into on-demand rendering. Only `/api/**` and
+`/admin/**` carry `export const prerender = false`; every marketing page is built ahead of
+time exactly as before.
 
 ```js
 import netlify from '@astrojs/netlify';
 
 export default defineConfig({
-  output: 'server',
+  site: 'https://jmpartyteam.com',
+  output: 'static',
   adapter: netlify(),
   // existing i18n + sitemap config unchanged
 });
 ```
+
+### 3.4 Measured cost of the migration
+
+The claim that the public site is unaffected was verified rather than asserted, by building
+the baseline commit in a git worktree with the same content source and comparing every
+generated file.
+
+| Measure | Baseline | After |
+|---|---|---|
+| Prerendered pages | 35 | 35 |
+| Pages byte-identical (stylesheet hash normalised) | — | **33 of 35** |
+| Pages differing | — | 2 — both contact pages, where the form lives |
+| Shared stylesheet | 28 026 B | **27 979 B** (−47 B) |
+
+The first attempt at this comparison was invalid: the baseline build had no `.env` and fell
+back to placeholder content while the branch read live content from Sanity, so every page
+differed for a reason unrelated to the change. Controlling the content source reduced the
+difference to the two pages that genuinely changed.
+
+The comparison also caught a regression that was not otherwise visible. Tailwind's automatic
+content detection scans the whole repository, so the admin pages' utility classes had entered
+the stylesheet every public visitor downloads (+1 199 B), and prose in `docs/` was generating
+classes from ordinary English words such as `container`, `grow` and `visible`. Scoping
+detection to `src/` and excluding server code and the admin area removed both, leaving the
+stylesheet marginally smaller than the baseline. The admin area now carries its own plain
+stylesheet.
+
+This is a small effect in absolute terms. It is included because it demonstrates the method:
+a claim about performance was stated, tested, found false, and corrected.
 
 ---
 
@@ -457,8 +487,9 @@ Drizzle is preferred over Prisma: it emits plain SQL migrations (needed for the 
 
 1. **Correctness** *(Tier 0 — mandatory)* — done; see §5.2. Double-booking rate across four
    strategies and four concurrency levels, with the latency tail that distinguishes them.
-2. **Performance** *(Tier 0 — cheap, do it)* — p50/p95/p99 API latency; Core Web Vitals before
-   vs. after the static → hybrid migration.
+2. **Performance** *(Tier 0 — cheap, do it)* — done for the static output; see §3.4. Every
+   marketing page byte-identical to the baseline bar the two that changed, stylesheet 47 B
+   smaller. Still outstanding: p50/p95/p99 latency of the API over HTTP.
 3. **Cost** — €/month at 1k / 10k / 100k monthly visitors; serverless vs. small VPS.
 4. **Usability** — SUS questionnaire with 8–12 participants on the booking flow; task completion
    time and error rate.
