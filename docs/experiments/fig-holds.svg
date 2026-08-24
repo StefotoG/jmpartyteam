@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" font-family="Inter, Helvetica, Arial, sans-serif">
+  <rect width="760" height="420" fill="#ffffff"/>
+  <text x="72" y="26" font-size="15" font-weight="700" fill="#14161a">How long to hold a date before letting it go</text>
+  <text x="72" y="44" font-size="11.5" fill="#5a626e">Mean over 8 runs. Too short and accepted clients are turned away; too long and non-repliers squat on dates.</text>
+  <g transform="translate(72,56)">
+    <line x1="0" y1="308.0" x2="498" y2="308.0" stroke="#e2e6ec"/>
+    <text x="-10" y="312.0" font-size="10.5" fill="#5a626e" text-anchor="end">0</text>
+    <line x1="0" y1="231.0" x2="498" y2="231.0" stroke="#e2e6ec"/>
+    <text x="-10" y="235.0" font-size="10.5" fill="#5a626e" text-anchor="end">10</text>
+    <line x1="0" y1="154.0" x2="498" y2="154.0" stroke="#e2e6ec"/>
+    <text x="-10" y="158.0" font-size="10.5" fill="#5a626e" text-anchor="end">21</text>
+    <line x1="0" y1="77.0" x2="498" y2="77.0" stroke="#e2e6ec"/>
+    <text x="-10" y="81.0" font-size="10.5" fill="#5a626e" text-anchor="end">31</text>
+    <line x1="0" y1="0.0" x2="498" y2="0.0" stroke="#e2e6ec"/>
+    <text x="-10" y="4.0" font-size="10.5" fill="#5a626e" text-anchor="end">42</text>
+    <line x1="290.5" y1="0" x2="290.5" y2="308" stroke="#1f8a5f" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+    <text x="296.5" y="12" font-size="10.5" fill="#1f8a5f">most bookings won</text>
+    <polyline points="41.5,0.0 124.5,67.7 207.5,144.7 290.5,186.5 373.5,196.7 456.5,219.9" fill="none" stroke="#8b93a1" stroke-width="1.5" stroke-dasharray="4 3" stroke-linejoin="round"/>
+    <circle cx="41.5" cy="0.0" r="3.5" fill="#8b93a1"/>
+    <circle cx="124.5" cy="67.7" r="3.5" fill="#8b93a1"/>
+    <circle cx="207.5" cy="144.7" r="3.5" fill="#8b93a1"/>
+    <circle cx="290.5" cy="186.5" r="3.5" fill="#8b93a1"/>
+    <circle cx="373.5" cy="196.7" r="3.5" fill="#8b93a1"/>
+    <circle cx="456.5" cy="219.9" r="3.5" fill="#8b93a1"/>
+    <polyline points="41.5,270.9 124.5,254.2 207.5,241.2 290.5,235.6 373.5,242.1 456.5,257.9" fill="none" stroke="#1f8a5f" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="41.5" cy="270.9" r="3.5" fill="#1f8a5f"/>
+    <circle cx="124.5" cy="254.2" r="3.5" fill="#1f8a5f"/>
+    <circle cx="207.5" cy="241.2" r="3.5" fill="#1f8a5f"/>
+    <circle cx="290.5" cy="235.6" r="3.5" fill="#1f8a5f"/>
+    <circle cx="373.5" cy="242.1" r="3.5" fill="#1f8a5f"/>
+    <circle cx="456.5" cy="257.9" r="3.5" fill="#1f8a5f"/>
+    <polyline points="41.5,154.0 124.5,216.2 207.5,270.9 290.5,308.0 373.5,308.0 456.5,308.0" fill="none" stroke="#c0392b" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="41.5" cy="154.0" r="3.5" fill="#c0392b"/>
+    <circle cx="124.5" cy="216.2" r="3.5" fill="#c0392b"/>
+    <circle cx="207.5" cy="270.9" r="3.5" fill="#c0392b"/>
+    <circle cx="290.5" cy="308.0" r="3.5" fill="#c0392b"/>
+    <circle cx="373.5" cy="308.0" r="3.5" fill="#c0392b"/>
+    <circle cx="456.5" cy="308.0" r="3.5" fill="#c0392b"/>
+    <text x="41.5" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">0.17</text>
+    <text x="124.5" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">0.33</text>
+    <text x="207.5" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">0.67</text>
+    <text x="290.5" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">1.33</text>
+    <text x="373.5" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">2.67</text>
+    <text x="456.5" y="328" font-size="11.5" fill="#14161a" text-anchor="middle">5.33</text>
+    <line x1="0" y1="308" x2="498" y2="308" stroke="#8b93a1"/>
+    <text transform="translate(-52,154) rotate(-90)" font-size="11" fill="#5a626e" text-anchor="middle">enquiries out of 60</text>
+    <text x="249" y="350" font-size="11" fill="#5a626e" text-anchor="middle">hold deadline ÷ longest client reply time</text>
+  </g>
+  <rect x="594" y="55" width="11" height="11" rx="2" fill="#8b93a1"/>
+  <text x="612" y="64" font-size="11.5" fill="#14161a">accepted</text>
+  <rect x="594" y="77" width="11" height="11" rx="2" fill="#1f8a5f"/>
+  <text x="612" y="86" font-size="11.5" fill="#14161a">confirmed</text>
+  <rect x="594" y="99" width="11" height="11" rx="2" fill="#c0392b"/>
+  <text x="612" y="108" font-size="11.5" fill="#14161a">turned away late</text>
+</svg>

@@ -363,11 +363,51 @@ would have reached production. It is fixed in migration `005` and covered by a r
 Worth stating plainly in the defence: this was found by running the system under load, not by
 the unit tests, and not by reading the code.
 
-### 5.5 Experiment 2 — hold TTL trade-off (not implemented)
+### 5.5 Experiment 2 — how long to hold a date
 
-A `HOLD` row would reserve the slot while the client completes payment, swept by a scheduled
-function on expiry. Varying TTL ∈ {5, 10, 20, 30} minutes would measure conversion against
-inventory blocking. Deferred with the payment work; recorded here as future work.
+An enquiry takes a hold rather than a permanent allocation, so that silence frees the date
+again. Choosing the deadline is a trade-off with a cost on both sides: too short and a client
+who was accepted is turned away before they get round to replying; too long and someone who
+never replies squats on a Saturday another client would have paid for.
+
+Expiry cannot be expressed in the exclusion constraint, because an index predicate must be
+immutable and `now()` is not. So `active` remains the arbiter and lapsed holds are retired —
+eagerly inside the transaction that contends for the date, behind the same advisory lock, and
+by a background sweeper everywhere else. The deadline therefore takes effect immediately where
+it matters, and the guarantee stays in the database.
+
+Timescales are compressed: what governs the outcome is the ratio between the deadline and how
+long clients take to reply, not the absolute durations. Sixty enquiries arrive over six seconds
+for twelve dates served by one DJ; 60 % of clients eventually reply, after a delay drawn
+uniformly from 0–1500 ms. Eight runs per deadline.
+
+| Deadline ÷ reply time | Accepted | Confirmed (sd) | Turned away late | Dates sold |
+|---|---|---|---|---|
+| 0.17 | 41.5 | 5.0 (1.6) | **20.8** | 5.0 / 12 |
+| 0.33 | 32.4 | 7.3 (1.1) | 12.4 | 7.3 / 12 |
+| 0.67 | 22.0 | 9.0 (1.5) | 5.0 | 9.0 / 12 |
+| **1.33** | 16.4 | **9.8 (1.6)** | 0.0 | 9.8 / 12 |
+| 2.67 | 15.0 | 8.9 (1.5) | 0.0 | 8.9 / 12 |
+| 5.33 | 11.9 | 6.8 (1.5) | 0.0 | 6.8 / 12 |
+
+![Choosing the hold deadline](experiments/fig-holds.svg)
+
+Two things are worth drawing out.
+
+**Acceptance is an anti-metric.** The shortest deadline accepts the most enquiries — 41.5 of 60,
+nearly three times as many as the best-performing setting — and converts the fewest, 5.0. It
+looks like the busiest configuration on any dashboard that counts enquiries, while turning away
+20.8 clients who had already been told yes. Optimising the number the business sees first would
+choose exactly the worst setting.
+
+**The penalty is asymmetric.** Moving from the optimum to a deadline four times too long costs
+about three bookings (9.8 → 6.8); moving to one eight times too short costs about five (9.8 →
+5.0) *and* produces the reputational damage of retracted acceptances. When the reply time is
+uncertain, erring long is the cheaper mistake.
+
+For production the ratio suggests a deadline slightly longer than the slowest realistic reply.
+The DJs answer enquiries within a day or so, which puts the 48-hour default in roughly the
+right place — a claim now supported by a measurement rather than by intuition.
 
 ---
 

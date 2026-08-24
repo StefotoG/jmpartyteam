@@ -5,6 +5,7 @@
  */
 import type { Sql } from '../db/client.ts';
 import { errorCode, PG_EXCLUSION_VIOLATION, withRetry } from '../db/retry.ts';
+import { DEFAULT_HOLD_TTL_SECONDS } from './holds.ts';
 
 export interface EnquiryInput {
   fullName: string;
@@ -69,6 +70,7 @@ export async function isDateAvailable(sql: Sql, eventDate: string): Promise<bool
           FROM booking_resource br
           WHERE br.resource_id = r.id
             AND br.active
+            AND NOT (br.state = 'held' AND br.expires_at <= now())
             AND br.slot && default_allocation_slot(${eventDate}::date)
         )
     ) AS available`;
@@ -76,13 +78,26 @@ export async function isDateAvailable(sql: Sql, eventDate: string): Promise<bool
   return row.available;
 }
 
-export async function createEnquiry(sql: Sql, input: EnquiryInput): Promise<EnquiryResult> {
+export async function createEnquiry(
+  sql: Sql,
+  input: EnquiryInput,
+  holdTtlSeconds: number = DEFAULT_HOLD_TTL_SECONDS
+): Promise<EnquiryResult> {
   try {
     return await withRetry(() =>
       sql.begin(async (tx) => {
         // Serialises everyone competing for this date. Without it, concurrent enquiries
         // deadlock inside the exclusion index and wait out the deadlock detector.
         await tx`SELECT pg_advisory_xact_lock(hashtext(${input.eventDate})::bigint)`;
+
+        // Holds whose deadline has passed are still `active`; retire them before deciding.
+        await tx`
+          UPDATE booking_resource
+          SET active = false
+          WHERE active
+            AND state = 'held'
+            AND expires_at <= now()
+            AND slot && default_allocation_slot(${input.eventDate}::date)`;
 
         const [resource] = await tx<{ id: string }[]>`
           SELECT r.id
@@ -128,11 +143,13 @@ export async function createEnquiry(sql: Sql, input: EnquiryInput): Promise<Enqu
           RETURNING id, reference`;
 
         await tx`
-          INSERT INTO booking_resource (booking_id, resource_id, slot)
+          INSERT INTO booking_resource (booking_id, resource_id, slot, state, expires_at)
           VALUES (
             ${booking.id},
             ${resource.id},
-            default_allocation_slot(${input.eventDate}::date)
+            default_allocation_slot(${input.eventDate}::date),
+            'held',
+            now() + make_interval(secs => ${holdTtlSeconds})
           )`;
 
         return { ok: true, reference: booking.reference } as const;

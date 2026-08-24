@@ -1,0 +1,445 @@
+{
+  "generatedAt": "2026-08-24T12:44:06.651Z",
+  "parameters": {
+    "ARRIVALS": 60,
+    "ARRIVAL_GAP_MS": 100,
+    "DATES": 12,
+    "CONFIRM_PROBABILITY": 0.6,
+    "MAX_CONFIRM_DELAY_MS": 1500,
+    "REPETITIONS": 8
+  },
+  "results": [
+    {
+      "ttlMs": 250,
+      "run": 1,
+      "accepted": 46,
+      "refusedOnArrival": 14,
+      "confirmed": 7,
+      "confirmTooLate": 24,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 250,
+      "run": 2,
+      "accepted": 39,
+      "refusedOnArrival": 21,
+      "confirmed": 7,
+      "confirmTooLate": 15,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 250,
+      "run": 3,
+      "accepted": 40,
+      "refusedOnArrival": 20,
+      "confirmed": 5,
+      "confirmTooLate": 19,
+      "datesSold": 5
+    },
+    {
+      "ttlMs": 250,
+      "run": 4,
+      "accepted": 44,
+      "refusedOnArrival": 16,
+      "confirmed": 4,
+      "confirmTooLate": 18,
+      "datesSold": 4
+    },
+    {
+      "ttlMs": 250,
+      "run": 5,
+      "accepted": 35,
+      "refusedOnArrival": 25,
+      "confirmed": 4,
+      "confirmTooLate": 11,
+      "datesSold": 4
+    },
+    {
+      "ttlMs": 250,
+      "run": 6,
+      "accepted": 35,
+      "refusedOnArrival": 25,
+      "confirmed": 6,
+      "confirmTooLate": 21,
+      "datesSold": 6
+    },
+    {
+      "ttlMs": 250,
+      "run": 7,
+      "accepted": 46,
+      "refusedOnArrival": 14,
+      "confirmed": 2,
+      "confirmTooLate": 27,
+      "datesSold": 2
+    },
+    {
+      "ttlMs": 250,
+      "run": 8,
+      "accepted": 47,
+      "refusedOnArrival": 13,
+      "confirmed": 5,
+      "confirmTooLate": 31,
+      "datesSold": 5
+    },
+    {
+      "ttlMs": 500,
+      "run": 1,
+      "accepted": 42,
+      "refusedOnArrival": 18,
+      "confirmed": 6,
+      "confirmTooLate": 17,
+      "datesSold": 6
+    },
+    {
+      "ttlMs": 500,
+      "run": 2,
+      "accepted": 27,
+      "refusedOnArrival": 33,
+      "confirmed": 9,
+      "confirmTooLate": 8,
+      "datesSold": 9
+    },
+    {
+      "ttlMs": 500,
+      "run": 3,
+      "accepted": 31,
+      "refusedOnArrival": 29,
+      "confirmed": 7,
+      "confirmTooLate": 10,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 500,
+      "run": 4,
+      "accepted": 31,
+      "refusedOnArrival": 29,
+      "confirmed": 7,
+      "confirmTooLate": 11,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 500,
+      "run": 5,
+      "accepted": 36,
+      "refusedOnArrival": 24,
+      "confirmed": 6,
+      "confirmTooLate": 12,
+      "datesSold": 6
+    },
+    {
+      "ttlMs": 500,
+      "run": 6,
+      "accepted": 31,
+      "refusedOnArrival": 29,
+      "confirmed": 7,
+      "confirmTooLate": 14,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 500,
+      "run": 7,
+      "accepted": 25,
+      "refusedOnArrival": 35,
+      "confirmed": 9,
+      "confirmTooLate": 10,
+      "datesSold": 9
+    },
+    {
+      "ttlMs": 500,
+      "run": 8,
+      "accepted": 36,
+      "refusedOnArrival": 24,
+      "confirmed": 7,
+      "confirmTooLate": 17,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 1000,
+      "run": 1,
+      "accepted": 20,
+      "refusedOnArrival": 40,
+      "confirmed": 10,
+      "confirmTooLate": 6,
+      "datesSold": 10
+    },
+    {
+      "ttlMs": 1000,
+      "run": 2,
+      "accepted": 23,
+      "refusedOnArrival": 37,
+      "confirmed": 8,
+      "confirmTooLate": 7,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 1000,
+      "run": 3,
+      "accepted": 21,
+      "refusedOnArrival": 39,
+      "confirmed": 12,
+      "confirmTooLate": 5,
+      "datesSold": 12
+    },
+    {
+      "ttlMs": 1000,
+      "run": 4,
+      "accepted": 31,
+      "refusedOnArrival": 29,
+      "confirmed": 7,
+      "confirmTooLate": 9,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 1000,
+      "run": 5,
+      "accepted": 20,
+      "refusedOnArrival": 40,
+      "confirmed": 8,
+      "confirmTooLate": 2,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 1000,
+      "run": 6,
+      "accepted": 25,
+      "refusedOnArrival": 35,
+      "confirmed": 10,
+      "confirmTooLate": 6,
+      "datesSold": 10
+    },
+    {
+      "ttlMs": 1000,
+      "run": 7,
+      "accepted": 18,
+      "refusedOnArrival": 42,
+      "confirmed": 9,
+      "confirmTooLate": 1,
+      "datesSold": 9
+    },
+    {
+      "ttlMs": 1000,
+      "run": 8,
+      "accepted": 18,
+      "refusedOnArrival": 42,
+      "confirmed": 8,
+      "confirmTooLate": 4,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 2000,
+      "run": 1,
+      "accepted": 20,
+      "refusedOnArrival": 40,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 2000,
+      "run": 2,
+      "accepted": 18,
+      "refusedOnArrival": 42,
+      "confirmed": 9,
+      "confirmTooLate": 0,
+      "datesSold": 9
+    },
+    {
+      "ttlMs": 2000,
+      "run": 3,
+      "accepted": 12,
+      "refusedOnArrival": 48,
+      "confirmed": 12,
+      "confirmTooLate": 0,
+      "datesSold": 12
+    },
+    {
+      "ttlMs": 2000,
+      "run": 4,
+      "accepted": 16,
+      "refusedOnArrival": 44,
+      "confirmed": 10,
+      "confirmTooLate": 0,
+      "datesSold": 10
+    },
+    {
+      "ttlMs": 2000,
+      "run": 5,
+      "accepted": 17,
+      "refusedOnArrival": 43,
+      "confirmed": 7,
+      "confirmTooLate": 0,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 2000,
+      "run": 6,
+      "accepted": 16,
+      "refusedOnArrival": 44,
+      "confirmed": 10,
+      "confirmTooLate": 0,
+      "datesSold": 10
+    },
+    {
+      "ttlMs": 2000,
+      "run": 7,
+      "accepted": 15,
+      "refusedOnArrival": 45,
+      "confirmed": 11,
+      "confirmTooLate": 0,
+      "datesSold": 11
+    },
+    {
+      "ttlMs": 2000,
+      "run": 8,
+      "accepted": 17,
+      "refusedOnArrival": 43,
+      "confirmed": 11,
+      "confirmTooLate": 0,
+      "datesSold": 11
+    },
+    {
+      "ttlMs": 4000,
+      "run": 1,
+      "accepted": 15,
+      "refusedOnArrival": 45,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 4000,
+      "run": 2,
+      "accepted": 15,
+      "refusedOnArrival": 45,
+      "confirmed": 11,
+      "confirmTooLate": 0,
+      "datesSold": 11
+    },
+    {
+      "ttlMs": 4000,
+      "run": 3,
+      "accepted": 14,
+      "refusedOnArrival": 46,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 4000,
+      "run": 4,
+      "accepted": 14,
+      "refusedOnArrival": 46,
+      "confirmed": 12,
+      "confirmTooLate": 0,
+      "datesSold": 12
+    },
+    {
+      "ttlMs": 4000,
+      "run": 5,
+      "accepted": 16,
+      "refusedOnArrival": 44,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 4000,
+      "run": 6,
+      "accepted": 15,
+      "refusedOnArrival": 45,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 4000,
+      "run": 7,
+      "accepted": 16,
+      "refusedOnArrival": 44,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 4000,
+      "run": 8,
+      "accepted": 15,
+      "refusedOnArrival": 45,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 8000,
+      "run": 1,
+      "accepted": 12,
+      "refusedOnArrival": 48,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 8000,
+      "run": 2,
+      "accepted": 11,
+      "refusedOnArrival": 49,
+      "confirmed": 8,
+      "confirmTooLate": 0,
+      "datesSold": 8
+    },
+    {
+      "ttlMs": 8000,
+      "run": 3,
+      "accepted": 12,
+      "refusedOnArrival": 48,
+      "confirmed": 4,
+      "confirmTooLate": 0,
+      "datesSold": 4
+    },
+    {
+      "ttlMs": 8000,
+      "run": 4,
+      "accepted": 12,
+      "refusedOnArrival": 48,
+      "confirmed": 7,
+      "confirmTooLate": 0,
+      "datesSold": 7
+    },
+    {
+      "ttlMs": 8000,
+      "run": 5,
+      "accepted": 12,
+      "refusedOnArrival": 48,
+      "confirmed": 6,
+      "confirmTooLate": 0,
+      "datesSold": 6
+    },
+    {
+      "ttlMs": 8000,
+      "run": 6,
+      "accepted": 12,
+      "refusedOnArrival": 48,
+      "confirmed": 6,
+      "confirmTooLate": 0,
+      "datesSold": 6
+    },
+    {
+      "ttlMs": 8000,
+      "run": 7,
+      "accepted": 12,
+      "refusedOnArrival": 48,
+      "confirmed": 6,
+      "confirmTooLate": 0,
+      "datesSold": 6
+    },
+    {
+      "ttlMs": 8000,
+      "run": 8,
+      "accepted": 12,
+      "refusedOnArrival": 48,
+      "confirmed": 9,
+      "confirmTooLate": 0,
+      "datesSold": 9
+    }
+  ]
+}
