@@ -28,17 +28,52 @@ commit, build-hook builds fail too, so content publishing breaks as well.
 | Command | Description |
 | --- | --- |
 | `npm run dev` | Dev server on http://localhost:4321 |
-| `npm run build` | Static build into `dist/` |
+| `npm run build` | Build into `dist/`; pages static, `/api/*` as one SSR function |
 | `npm run preview` | Preview the build locally |
 | `npm run check` | Type-check `.astro` and `.ts` files |
+| `npm run test` | Unit and integration tests (needs local PostgreSQL) |
+| `npm run db:migrate` | Apply the SQL migrations |
+| `npm run experiment` | Concurrency measurements into `docs/experiments/` |
+| `npm run experiment:charts` | Render the result figures as SVG |
+| `npm run thesis:pdf` | Render the diploma project plan to PDF |
 | `npm run placeholders` | Regenerate placeholder imagery |
 | `npm run seed` | Seed a Sanity dataset from the placeholder content |
 | `npm run deploy` | Build and deploy to Netlify production |
 
-Booking enquiries are captured by Netlify Forms and emailed to jmpartyteam@gmail.com.
-The DJs' calendar is deliberately **not** published: showing which dates are taken would
-expose their booking schedule to anyone, including competitors, so there is no
-availability endpoint.
+## Booking subsystem
+
+Enquiries are persisted in PostgreSQL and allocated against the DJs as individually
+bookable resources, so the same night can be sold twice when both are free and is refused
+once neither is. Correctness is enforced by an exclusion constraint in the database rather
+than by application code.
+
+The DJs' calendar is deliberately **not** published: `/api/availability` answers only about
+the one date it was asked about. Returning a list of free dates would let anyone, including
+competitors, reconstruct the whole schedule.
+
+| Route | Purpose |
+| --- | --- |
+| `POST /api/availability` | `{ date, serviceKey }` &rarr; `{ available }` |
+| `POST /api/bookings` | Create an enquiry; `409` when the date is taken |
+| `GET /admin` | Enquiry pipeline, behind a session cookie |
+| `POST /api/admin/login` | Issues the session |
+
+### Local database
+
+```bash
+brew install postgresql@17
+pg_ctl -D /opt/homebrew/var/postgresql@17 -l /tmp/pg17.log start
+createdb jm_booking
+createdb jm_booking_test
+npm run db:migrate
+```
+
+Connection URLs are string literals in [`src/server/db/client.ts`](src/server/db/client.ts)
+and must move into configuration before this is deployed, together with the admin password
+and session secret in [`src/server/auth/session.ts`](src/server/auth/session.ts).
+
+Use `127.0.0.1` rather than `localhost`: over IPv6 libpq attempts GSSAPI and fails when
+`krb5` is installed alongside PostgreSQL.
 
 ## Content
 
