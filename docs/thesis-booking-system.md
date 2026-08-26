@@ -6,7 +6,10 @@
 **Title (EN):** Design and Implementation of a Web-Based Booking System with
 Guaranteed Consistency under Concurrent Access
 
-**Programme:** MSc Software Engineering, Technical University of Sofia
+**Programme:** MSc Computer and Software Engineering, Technical University of Sofia,
+Faculty of Computer Systems and Technologies, Department of Computer Systems
+**Supervisor:** Проф. д-р Даниела Гоцева
+**Consultant:** Маг. инж. Димитър Караилиев
 **Base artifact:** `jm-party-team` — bilingual (BG/EN) Astro + Sanity marketing site
 **Extension:** transactional booking subsystem with concurrency-safe resource allocation
 
@@ -759,17 +762,20 @@ From §4, keep only: `customer`, `resource`, `booking` (including `price_snapsho
 
 ## 14. Thesis document structure
 
-| Chapter | Content |
-|---|---|
-| 1. Introduction | Domain, motivation, research question, objectives |
-| 2. Analysis | Requirements (functional/non-functional), competitor and technology survey |
-| 3. Related work | Booking/reservation systems, concurrency control literature, headless CMS patterns |
-| 4. Design | Architecture, domain model, state machine, ADRs and trade-offs |
-| 5. Implementation | Stack, key algorithms, security measures, i18n and accessibility |
-| 6. Testing | Strategy, coverage, CI pipeline |
-| 7. Evaluation | The five measurement sets from §11, with figures |
-| 8. Conclusion | Contributions, limitations, future work |
-| Appendices | Schema DDL, API reference, SUS questionnaire, load-test scripts |
+Eight chapters, matching the eight entries the faculty assignment form asks for under
+„Съдържание на обяснителната записка“.
+
+| Chapter | Content | Source material |
+|---|---|---|
+| 1. Introduction | Domain, motivation, research question, objectives | §1 |
+| 2. Requirements analysis | Functional and non-functional requirements; survey of existing booking solutions | §2 |
+| 3. Concurrency control and architectural background | Isolation levels, exclusion constraints, advisory locks, deadlock detection; headless CMS and serverless patterns | §5.1, literature |
+| 4. Design | Architecture, domain model, state machine, decisions and trade-offs | §3, §4, §6 |
+| 5. Implementation | Schema and migrations, API, admin, outbox notifications, i18n | §5, §6.1, §7 |
+| 6. Security and compliance | OWASP Top 10, authentication, rate limiting, GDPR/ЗЗЛД | §8 |
+| 7. Testing | Strategy, coverage, continuous integration | §9 |
+| 8. Experimental evaluation and conclusion | Both experiments with figures, contributions, limitations, future work | §5.2–§5.5, §11 |
+| Appendices | Schema DDL, API reference, SUS questionnaire, experiment scripts and raw data | `docs/experiments/` |
 
 ---
 
